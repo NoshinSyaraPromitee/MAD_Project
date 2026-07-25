@@ -1,0 +1,165 @@
+// Homemade organic fertilizer recipes.
+// Images are keyword-based placeholders (source.unsplash.com) — swap for
+// bundled local assets in production for guaranteed reliability/offline use.
+
+const fertilizers = [
+  {
+    id: "1",
+    name: "Banana Peel Fertilizer",
+    purpose: "Flowering & Fruit Production",
+    nutrient: "Potassium",
+    image: "https://source.unsplash.com/400x400/?banana,peel",
+    ingredients: ["2–3 banana peels", "1 liter water"],
+    preparation: [
+      "Cut the peels into small pieces.",
+      "Soak them in water for 24–48 hours.",
+      "Strain the liquid.",
+    ],
+    application: "Water plants once every week.",
+    benefits: [
+      "Rich in potassium.",
+      "Encourages flowering and fruit production.",
+    ],
+  },
+  {
+    id: "2",
+    name: "Eggshell Fertilizer",
+    purpose: "Calcium Boost",
+    nutrient: "Calcium",
+    image: "https://source.unsplash.com/400x400/?eggshells",
+    ingredients: ["5–6 eggshells"],
+    preparation: [
+      "Wash the shells.",
+      "Dry them completely.",
+      "Grind into a fine powder.",
+    ],
+    application: "Sprinkle around the plant base every month.",
+    benefits: ["Supplies calcium.", "Prevents calcium deficiency."],
+  },
+  {
+    id: "3",
+    name: "Rice Wash Water Fertilizer",
+    purpose: "Root Growth",
+    nutrient: "Vitamins & Minerals",
+    image: "https://source.unsplash.com/400x400/?rice,water",
+    ingredients: ["Water used for washing rice"],
+    preparation: ["Collect the first or second rinse water."],
+    application: "Use immediately to water plants.",
+    benefits: [
+      "Contains vitamins, minerals, and starch.",
+      "Supports healthy root growth.",
+    ],
+  },
+  {
+    id: "4",
+    name: "Tea Leaf Compost",
+    purpose: "Soil Improvement",
+    nutrient: "Organic Matter",
+    image: "https://source.unsplash.com/400x400/?used,tea,leaves",
+    ingredients: ["Used tea leaves (without sugar or milk)"],
+    preparation: ["Wash if necessary.", "Dry before use."],
+    application: "Mix into the soil.",
+    benefits: ["Adds organic matter.", "Improves soil texture."],
+  },
+  {
+    id: "5",
+    name: "Vegetable Peel Compost",
+    purpose: "Balanced Soil Fertility",
+    nutrient: "Balanced Nutrients",
+    image: "https://source.unsplash.com/400x400/?vegetable,peels,compost",
+    ingredients: ["Vegetable peels", "Dry leaves", "Soil"],
+    preparation: [
+      "Layer vegetable peels and dry leaves.",
+      "Cover with soil.",
+      "Compost for 30–45 days.",
+    ],
+    application: "Mix compost into garden soil.",
+    benefits: ["Provides balanced nutrients.", "Improves soil fertility."],
+  },
+  {
+    id: "6",
+    name: "Mustard Cake Fertilizer",
+    purpose: "Leafy Growth",
+    nutrient: "Nitrogen",
+    image: "https://source.unsplash.com/400x400/?mustard,seeds",
+    ingredients: ["100 g mustard oil cake", "2 liters water"],
+    preparation: [
+      "Soak for 2–3 days.",
+      "Dilute with equal amount of water before use.",
+    ],
+    application: "Apply every 15–20 days.",
+    benefits: ["Rich in nitrogen.", "Promotes leafy growth."],
+  },
+  {
+    id: "7",
+    name: "Wood Ash Fertilizer",
+    purpose: "Flowering Support",
+    nutrient: "Potassium & Calcium",
+    image: "https://source.unsplash.com/400x400/?wood,ash",
+    ingredients: ["Clean wood ash (no charcoal or chemicals)"],
+    preparation: ["Collect cooled ash."],
+    application: "Sprinkle a small amount around plants.",
+    benefits: ["Rich in potassium and calcium.", "Helps flowering."],
+  },
+  {
+    id: "8",
+    name: "Onion Peel Fertilizer",
+    purpose: "Micronutrient Boost",
+    nutrient: "Micronutrients",
+    image: "https://source.unsplash.com/400x400/?onion,peel",
+    ingredients: ["Onion peels", "1 liter water"],
+    preparation: ["Soak peels for 24 hours.", "Strain the liquid."],
+    application: "Water plants every two weeks.",
+    benefits: [
+      "Provides micronutrients.",
+      "Supports healthy plant growth.",
+    ],
+  },
+  {
+    id: "9",
+    name: "Fish Waste Fertilizer",
+    purpose: "Vigorous Growth",
+    nutrient: "Nitrogen & Phosphorus",
+    image: "https://source.unsplash.com/400x400/?fish,scales",
+    ingredients: ["Fish scales or fish waste", "Water", "Airtight container"],
+    preparation: [
+      "Place fish waste in the container.",
+      "Add water.",
+      "Ferment for about 2 weeks.",
+      "Dilute before use (1:10 with water).",
+    ],
+    application: "Apply once every 2–3 weeks.",
+    benefits: [
+      "High in nitrogen and phosphorus.",
+      "Encourages vigorous growth.",
+    ],
+  },
+  {
+    id: "10",
+    name: "Cow Dung Liquid Fertilizer",
+    purpose: "Balanced Nutrients",
+    nutrient: "Balanced Nutrients",
+    image: "https://source.unsplash.com/400x400/?farm,soil",
+    ingredients: ["1 kg well-decomposed cow dung", "10 liters water"],
+    preparation: [
+      "Mix thoroughly.",
+      "Let it sit for 24 hours.",
+      "Strain the liquid.",
+    ],
+    application: "Water plants every 2 weeks.",
+    benefits: [
+      "Provides balanced nutrients.",
+      "Improves soil microorganisms.",
+    ],
+  },
+];
+
+export const fertilizerSafetyTips = [
+  "Avoid using fertilizers on very young seedlings.",
+  "Do not overapply homemade fertilizers, as excess nutrients can harm plants.",
+  "Dilute liquid fertilizers before use whenever recommended.",
+  "Store homemade fertilizers in covered containers away from children and pets.",
+  "Use only well-decomposed organic materials to reduce odor and the risk of plant diseases.",
+];
+
+export default fertilizers;
