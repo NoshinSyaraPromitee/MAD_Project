@@ -1,14 +1,10 @@
-// Homemade organic fertilizer recipes.
-// Images are keyword-based placeholders (source.unsplash.com) — swap for
-// bundled local assets in production for guaranteed reliability/offline use.
-
 const fertilizers = [
   {
     id: "1",
     name: "Banana Peel Fertilizer",
     purpose: "Flowering & Fruit Production",
     nutrient: "Potassium",
-    image: "https://source.unsplash.com/400x400/?banana,peel",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ49wgFnRoOTnBHPJoN_Nfz0i85KI0LHTvE4A&s",
     ingredients: ["2–3 banana peels", "1 liter water"],
     preparation: [
       "Cut the peels into small pieces.",
@@ -26,7 +22,7 @@ const fertilizers = [
     name: "Eggshell Fertilizer",
     purpose: "Calcium Boost",
     nutrient: "Calcium",
-    image: "https://source.unsplash.com/400x400/?eggshells",
+    image: "https://images.squarespace-cdn.com/content/v1/5a77726fd55b41858d2a4f77/1616355449634-NOOBWQS0YHXJB8DIGPP8/Eggshells+Gardening-3.jpg",
     ingredients: ["5–6 eggshells"],
     preparation: [
       "Wash the shells.",
@@ -55,7 +51,7 @@ const fertilizers = [
     name: "Tea Leaf Compost",
     purpose: "Soil Improvement",
     nutrient: "Organic Matter",
-    image: "https://source.unsplash.com/400x400/?used,tea,leaves",
+    image: "https://homesteadandchill.com/wp-content/uploads/2023/08/homestead-chill-garden-articles-landing-page-compost-soil-health.webp",
     ingredients: ["Used tea leaves (without sugar or milk)"],
     preparation: ["Wash if necessary.", "Dry before use."],
     application: "Mix into the soil.",

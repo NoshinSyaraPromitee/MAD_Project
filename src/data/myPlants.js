@@ -1,82 +1,171 @@
 const myPlants = [
   {
     id: "1",
-    nickname: "Bella",
-    species: "Monstera Deliciosa",
-    image:
-      "https://images.unsplash.com/photo-1463320726281-696a485928c7?w=800",
-
-    health: 96,
+    nickname: "Aam",
+    species: "Mango Tree",
+    image: "https://cdn.mos.cms.futurecdn.net/bqvTb7yeNqqgTj2B7ZTWs7.jpg",
+    health: 95,
     status: "Healthy",
-
-    location: "Living Room",
-
-    sunlight: "Medium",
-
+    location: "Backyard",
+    sunlight: "Full Sun",
     waterLevel: "Tomorrow",
-
     lastWatered: "2026-07-24",
-
     nextWatering: "2026-07-26",
-
     fertilizer: "Next Week",
-
-    humidity: "65%",
-
-    lastScan: "2 days ago",
+    humidity: "75%",
+    lastScan: "Today",
   },
 
   {
     id: "2",
-    nickname: "Sunny",
-    species: "Snake Plant",
-    image:
-      "https://images.unsplash.com/photo-1545241047-6083a3684587?w=800",
-
-    health: 82,
-    status: "Needs Water",
-
-    location: "Bedroom",
-
-    sunlight: "Low",
-
-    waterLevel: "Today",
-
-    lastWatered: "2026-07-20",
-
-    nextWatering: "2026-07-25",
-
-    fertilizer: "Tomorrow",
-
-    humidity: "55%",
-
+    nickname: "Kathal",
+    species: "Jackfruit Tree",
+    image: "https://www.thespruce.com/thmb/TrwpX9JXEThNSgL6Fui-RRyYiEY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/grow-jackfruit-indoors-1902445-02-5c7391cd861e4a9a87ddb11eebecc922.jpg",
+    health: 91,
+    status: "Healthy",
+    location: "Garden",
+    sunlight: "Full Sun",
+    waterLevel: "2 Days",
+    lastWatered: "2026-07-23",
+    nextWatering: "2026-07-27",
+    fertilizer: "2 Weeks",
+    humidity: "78%",
     lastScan: "Yesterday",
   },
 
   {
     id: "3",
-    nickname: "Rosie",
-    species: "Peace Lily",
-    image:
-      "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=800",
-
-    health: 91,
+    nickname: "Narikel",
+    species: "Coconut Tree",
+    image: "https://afrimash.com/wp-content/uploads/2019/12/coconut-seedling-main.jpg",
+    health: 94,
     status: "Healthy",
-
-    location: "Office",
-
-    sunlight: "Bright",
-
+    location: "Front Yard",
+    sunlight: "Full Sun",
     waterLevel: "3 Days",
-
-    lastWatered: "2026-07-23",
-
+    lastWatered: "2026-07-22",
     nextWatering: "2026-07-28",
+    fertilizer: "Next Month",
+    humidity: "80%",
+    lastScan: "Today",
+  },
 
+  {
+    id: "4",
+    nickname: "Lichu",
+    species: "Lychee Tree",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-kTxlhR4xiTQrfFzWE__eEpJhixFqreV_zsmxcfsh6CXnNqB_vQu3VSU&s=10",
+    health: 89,
+    status: "Needs Water",
+    location: "Orchard",
+    sunlight: "Full Sun",
+    waterLevel: "Today",
+    lastWatered: "2026-07-20",
+    nextWatering: "2026-07-25",
+    fertilizer: "1 Week",
+    humidity: "74%",
+    lastScan: "Yesterday",
+  },
+
+  {
+    id: "5",
+    nickname: "Peyara",
+    species: "Guava Tree",
+    image: "https://cdn.mos.cms.futurecdn.net/7buVCESCzMygyZvJTZh969-1130-80.jpg",
+    health: 96,
+    status: "Healthy",
+    location: "Backyard",
+    sunlight: "Full Sun",
+    waterLevel: "Tomorrow",
+    lastWatered: "2026-07-24",
+    nextWatering: "2026-07-26",
     fertilizer: "2 Weeks",
+    humidity: "72%",
+    lastScan: "Today",
+  },
 
+  {
+    id: "6",
+    nickname: "Kola",
+    species: "Banana Plant",
+    image: "https://images.unsplash.com/photo-1528825871115-3581a5387919?w=800",
+    health: 90,
+    status: "Healthy",
+    location: "Garden",
+    sunlight: "Full Sun",
+    waterLevel: "Tomorrow",
+    lastWatered: "2026-07-23",
+    nextWatering: "2026-07-26",
+    fertilizer: "1 Week",
+    humidity: "81%",
+    lastScan: "Today",
+  },
+
+  {
+    id: "7",
+    nickname: "Dhan",
+    species: "Rice Plant",
+    image: "https://images.unsplash.com/photo-1536053299134-5d3f31b8dff4?w=800",
+    health: 88,
+    status: "Needs Water",
+    location: "Paddy Field",
+    sunlight: "Full Sun",
+    waterLevel: "Today",
+    lastWatered: "2026-07-22",
+    nextWatering: "2026-07-25",
+    fertilizer: "Tomorrow",
+    humidity: "84%",
+    lastScan: "Yesterday",
+  },
+
+  {
+    id: "8",
+    nickname: "Paat",
+    species: "Jute Plant",
+    image: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800",
+    health: 93,
+    status: "Healthy",
+    location: "Farm",
+    sunlight: "Full Sun",
+    waterLevel: "2 Days",
+    lastWatered: "2026-07-23",
+    nextWatering: "2026-07-27",
+    fertilizer: "1 Week",
+    humidity: "82%",
+    lastScan: "Today",
+  },
+
+  {
+    id: "9",
+    nickname: "Begun",
+    species: "Eggplant",
+    image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800",
+    health: 87,
+    status: "Needs Fertilizer",
+    location: "Vegetable Garden",
+    sunlight: "Full Sun",
+    waterLevel: "Tomorrow",
+    lastWatered: "2026-07-24",
+    nextWatering: "2026-07-26",
+    fertilizer: "Today",
     humidity: "70%",
+    lastScan: "Today",
+  },
 
+  {
+    id: "10",
+    nickname: "Tomato",
+    species: "Tomato Plant",
+    image: "https://images.unsplash.com/photo-1546470427-e5f3b7d2f7d1?w=800",
+    health: 92,
+    status: "Healthy",
+    location: "Vegetable Garden",
+    sunlight: "Full Sun",
+    waterLevel: "2 Days",
+    lastWatered: "2026-07-23",
+    nextWatering: "2026-07-27",
+    fertilizer: "Next Week",
+    humidity: "73%",
     lastScan: "Today",
   },
 ];

@@ -43,8 +43,16 @@ export default function CartScreen({ navigation }) {
           {item.category}
         </Text>
 
+        {item.unit && (
+          <View style={styles.unitPill}>
+            <Text style={styles.unitText}>
+              {item.unit}
+            </Text>
+          </View>
+        )}
+
         <Text style={styles.price}>
-          ${item.price.toFixed(2)}
+          ৳{item.price.toFixed(2)}
         </Text>
 
         <View style={styles.quantityRow}>
@@ -57,6 +65,7 @@ export default function CartScreen({ navigation }) {
             <MaterialCommunityIcons
               name="minus"
               size={18}
+              color="#2E7D32"
             />
           </TouchableOpacity>
 
@@ -73,6 +82,7 @@ export default function CartScreen({ navigation }) {
             <MaterialCommunityIcons
               name="plus"
               size={18}
+              color="#2E7D32"
             />
           </TouchableOpacity>
         </View>
@@ -160,7 +170,7 @@ export default function CartScreen({ navigation }) {
                 <Text>Subtotal</Text>
 
                 <Text>
-                  ${totalPrice.toFixed(2)}
+                  ৳{totalPrice.toFixed(2)}
                 </Text>
               </View>
 
@@ -168,7 +178,7 @@ export default function CartScreen({ navigation }) {
                 <Text>Shipping</Text>
 
                 <Text>
-                  ${shipping.toFixed(2)}
+                  ৳{shipping.toFixed(2)}
                 </Text>
               </View>
 
@@ -176,7 +186,7 @@ export default function CartScreen({ navigation }) {
                 <Text>Tax</Text>
 
                 <Text>
-                  ${tax.toFixed(2)}
+                  ৳{tax.toFixed(2)}
                 </Text>
               </View>
 
@@ -190,7 +200,7 @@ export default function CartScreen({ navigation }) {
                 </Text>
 
                 <Text style={styles.total}>
-                  ${grandTotal.toFixed(2)}
+                  ৳{grandTotal.toFixed(2)}
                 </Text>
               </View>
 
@@ -268,6 +278,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 
+  unitPill: {
+    alignSelf: "flex-start",
+    backgroundColor: "#E8F5E9",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginBottom: 6,
+  },
+
+  unitText: {
+    color: "#2E7D32",
+    fontSize: 11,
+    fontWeight: "700",
+  },
+
   quantityRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -275,10 +300,12 @@ const styles = StyleSheet.create({
   },
 
   qtyButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: "#E8F5E9",
+    borderWidth: 1.5,
+    borderColor: "#2E7D32",
     justifyContent: "center",
     alignItems: "center",
   },

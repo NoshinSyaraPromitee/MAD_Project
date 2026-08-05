@@ -14,7 +14,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundColor": "#E6F4FE"
-      }
+      },
+      "package": "com.anonymous.myplantpal"
     },
     "web": {
       "output": "single"

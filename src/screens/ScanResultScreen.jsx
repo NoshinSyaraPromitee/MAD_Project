@@ -25,7 +25,7 @@ style={styles.container}
 <SafeAreaView style={styles.content}>
 
 <Text style={styles.title}>
-🌿 Plant Identified
+Plant Identified
 </Text>
 
 <View style={styles.card}>

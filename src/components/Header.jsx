@@ -4,12 +4,12 @@ import { View, Text, StyleSheet } from "react-native";
 export default function Header() {
   return (
     <View style={styles.container}>
-      <Text style={styles.greeting}>🌞 Good Morning,</Text>
+      <Text style={styles.greeting}>Hello</Text>
 
-      <Text style={styles.name}>Noshin 👋</Text>
+      <Text style={styles.name}>Noshin</Text>
 
       <Text style={styles.subtitle}>
-        Let's take care of your lovely plants today.
+       Ready to start the day ?
       </Text>
     </View>
   );

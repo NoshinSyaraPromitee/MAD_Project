@@ -33,7 +33,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.title}>Welcome Back!</Text>
 
           <Text style={styles.subtitle}>
-            Continue your plant journey 🌱
+          Missing your buddies?
           </Text>
         </View>
 

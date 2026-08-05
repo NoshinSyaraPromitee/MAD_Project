@@ -48,12 +48,9 @@ export default function MyPlantsScreen({ navigation }) {
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>
-              🌿 My Green Family
+              My Green Family
             </Text>
 
-            <Text style={styles.subtitle}>
-              Take care of your lovely plants
-            </Text>
           </View>
 
           <TouchableOpacity
@@ -91,11 +88,7 @@ export default function MyPlantsScreen({ navigation }) {
 
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
-            <MaterialCommunityIcons
-              name="leaf"
-              size={30}
-              color="#2E7D32"
-            />
+          
 
             <Text style={styles.number}>
               {myPlants.length}
@@ -107,11 +100,7 @@ export default function MyPlantsScreen({ navigation }) {
           </View>
 
           <View style={styles.statCard}>
-            <MaterialCommunityIcons
-              name="heart-pulse"
-              size={30}
-              color="#43A047"
-            />
+          
 
             <Text style={styles.number}>
               {averageHealth}%
@@ -123,11 +112,7 @@ export default function MyPlantsScreen({ navigation }) {
           </View>
 
           <View style={styles.statCard}>
-            <MaterialCommunityIcons
-              name="water"
-              size={30}
-              color="#42A5F5"
-            />
+          
 
             <Text style={styles.number}>
               {needsWater}

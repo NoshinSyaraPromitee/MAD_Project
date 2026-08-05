@@ -115,7 +115,7 @@ export default function ProfileScreen({ navigation }) {
             </Text>
 
             <Text style={styles.subtitle}>
-              🌿 Plant Parent since 2026
+              Plant Parent since 2026
             </Text>
           </View>
 
@@ -123,11 +123,7 @@ export default function ProfileScreen({ navigation }) {
 
           <View style={styles.statsContainer}>
             <View style={styles.statCard}>
-              <MaterialCommunityIcons
-                name="flower"
-                size={26}
-                color="#2E7D32"
-              />
+            
 
               <Text style={styles.statNumber}>
                 {myPlants.length}
@@ -139,11 +135,7 @@ export default function ProfileScreen({ navigation }) {
             </View>
 
             <View style={styles.statCard}>
-              <MaterialCommunityIcons
-                name="heart-pulse"
-                size={26}
-                color="#43A047"
-              />
+             
 
               <Text style={styles.statNumber}>
                 {averageHealth}%
@@ -155,11 +147,7 @@ export default function ProfileScreen({ navigation }) {
             </View>
 
             <View style={styles.statCard}>
-              <MaterialCommunityIcons
-                name="trophy"
-                size={26}
-                color="#FFB300"
-              />
+            
 
               <Text style={styles.statNumber}>
                 {achievements.filter((a) => a.unlocked).length}

@@ -9,12 +9,16 @@ import {
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { CartContext } from "../context/CartContext";
+import { WishlistContext } from "../context/WishlistContext";
 
 export default function ProductCard({
   product,
   navigation,
 }) {
   const { addToCart } = useContext(CartContext);
+  const { isInWishlist, toggleWishlist } = useContext(WishlistContext);
+
+  const wishlisted = isInWishlist(product.id);
 
   return (
     <TouchableOpacity
@@ -49,10 +53,14 @@ export default function ProductCard({
 
       {/* Wishlist */}
 
-      <TouchableOpacity style={styles.favorite}>
+      <TouchableOpacity
+        style={styles.favorite}
+        onPress={() => toggleWishlist(product)}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
         <MaterialCommunityIcons
-          name="heart-outline"
-          color="#2E7D32"
+          name={wishlisted ? "heart" : "heart-outline"}
+          color={wishlisted ? "#E53935" : "#2E7D32"}
           size={22}
         />
       </TouchableOpacity>
@@ -63,17 +71,27 @@ export default function ProductCard({
         {product.name}
       </Text>
 
-      {/* Category */}
+      {/* Category + Unit (measurement) */}
 
-      <Text style={styles.category}>
-        {product.category}
-      </Text>
+      <View style={styles.metaRow}>
+        <Text style={styles.category}>
+          {product.category}
+        </Text>
+
+        {product.unit && (
+          <View style={styles.unitPill}>
+            <Text style={styles.unitText}>
+              {product.unit}
+            </Text>
+          </View>
+        )}
+      </View>
 
       {/* Bottom */}
 
       <View style={styles.bottomRow}>
         <Text style={styles.price}>
-          ${product.price}
+        ৳{product.price.toFixed(2)}
         </Text>
 
         <TouchableOpacity
@@ -159,10 +177,31 @@ const styles = StyleSheet.create({
     color: "#2E7D32",
   },
 
-  category: {
-    color: "#777",
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
     marginTop: 4,
     marginBottom: 10,
+  },
+
+  category: {
+    color: "#777",
+    fontSize: 13,
+    marginRight: 6,
+  },
+
+  unitPill: {
+    backgroundColor: "#E8F5E9",
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+
+  unitText: {
+    color: "#2E7D32",
+    fontSize: 11,
+    fontWeight: "700",
   },
 
   bottomRow: {

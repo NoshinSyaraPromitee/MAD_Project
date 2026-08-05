@@ -18,6 +18,7 @@ import PlantHistoryScreen from "../screens/PlantHistoryScreen";
 // Shop
 import ProductDetailsScreen from "../screens/ProductDetailsScreen";
 import CartScreen from "../screens/CartScreen";
+import WishlistScreen from "../screens/WishlistScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 import PaymentScreen from "../screens/PaymentScreen";
 import OrderSuccessScreen from "../screens/OrderSuccessScreen";
@@ -98,6 +99,11 @@ export default function StackNavigator() {
       <Stack.Screen
         name="Cart"
         component={CartScreen}
+      />
+
+      <Stack.Screen
+        name="Wishlist"
+        component={WishlistScreen}
       />
 
       <Stack.Screen

@@ -19,12 +19,14 @@ import products from "../data/products";
 import categories from "../data/categories";
 
 import { CartContext } from "../context/CartContext";
+import { WishlistContext } from "../context/WishlistContext";
 
 export default function ShopScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [search, setSearch] = useState("");
 
   const { cartItems } = useContext(CartContext);
+  const { wishlistItems } = useContext(WishlistContext);
 
   const filteredProducts = products.filter((item) => {
     const categoryMatch =
@@ -49,33 +51,56 @@ export default function ShopScreen({ navigation }) {
         <View style={styles.header}>
           <View>
             <Text style={styles.smallText}>
-              🌿 Plant Store
+               Store
             </Text>
 
             <Text style={styles.title}>
-              Find Your Green Friend
+              Find Your necessary gardening equipment
             </Text>
           </View>
 
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Cart")}
-          >
-            <View>
-              <MaterialCommunityIcons
-                name="cart-outline"
-                size={34}
-                color="#2E7D32"
-              />
+          <View style={styles.headerIcons}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Wishlist")}
+              style={{ marginRight: 18 }}
+            >
+              <View>
+                <MaterialCommunityIcons
+                  name="heart-outline"
+                  size={30}
+                  color="#2E7D32"
+                />
 
-              {cartItems.length > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>
-                    {cartItems.length}
-                  </Text>
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
+                {wishlistItems.length > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {wishlistItems.length}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Cart")}
+            >
+              <View>
+                <MaterialCommunityIcons
+                  name="cart-outline"
+                  size={34}
+                  color="#2E7D32"
+                />
+
+                {cartItems.length > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {cartItems.length}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Search */}
@@ -183,6 +208,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 15,
     marginBottom: 20,
+  },
+
+  headerIcons: {
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   smallText: {

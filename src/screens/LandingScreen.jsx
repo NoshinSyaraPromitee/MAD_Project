@@ -20,19 +20,13 @@ export default function LandingScreen({ navigation }) {
         {/* Logo */}
 
         <View style={styles.logoContainer}>
-          <MaterialCommunityIcons
-            name="flower"
-            size={90}
-            color="#2E7D32"
-          />
+          
 
           <Text style={styles.title}>
             MyPlantPal
           </Text>
 
-          <Text style={styles.subtitle}>
-            Your Friendly AI Gardening Assistant
-          </Text>
+          
         </View>
 
         {/* Get Started Button */}

@@ -21,7 +21,7 @@ export default function PlantCard() {
         <Text style={styles.name}>Snake Plant</Text>
 
         <Text style={styles.status}>
-          💧 Water Tomorrow
+          Water Tomorrow
         </Text>
       </View>
 

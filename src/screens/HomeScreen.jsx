@@ -20,14 +20,14 @@ function getGreeting() {
   const hour = new Date().getHours();
 
   if (hour < 12) {
-    return "Good morning! Your plants missed you 🌞";
+    return "Good morning! Your plants missed you !!";
   }
 
   if (hour < 18) {
-    return "Good afternoon! Time to check on your leafy friends 🌿";
+    return "Good afternoon! Time to check on your leafy friends ";
   }
 
-  return "Good evening! One last peek before bed? 🌙";
+  return "Good evening! One last peek before bed? ";
 }
 
 export default function HomeScreen({ navigation }) {
@@ -55,7 +55,7 @@ export default function HomeScreen({ navigation }) {
           >
             <View>
               <Text style={styles.bannerTitle}>
-                🌿 Scan Your Plant
+                Scan Your Plant
               </Text>
 
               <Text style={styles.bannerText}>
