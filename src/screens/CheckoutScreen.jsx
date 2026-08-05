@@ -109,7 +109,7 @@ export default function CheckoutScreen({ navigation }) {
               Standard Delivery
             </Text>
 
-            <Text>3-5 Days • $5.99</Text>
+            <Text>3-5 Days • ৳ 60</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -126,7 +126,7 @@ export default function CheckoutScreen({ navigation }) {
               Express Delivery
             </Text>
 
-            <Text>1-2 Days • $12.99</Text>
+            <Text>1-2 Days • ৳12.99</Text>
           </TouchableOpacity>
 
           {/* Summary */}
@@ -138,17 +138,17 @@ export default function CheckoutScreen({ navigation }) {
           <View style={styles.summary}>
             <View style={styles.row}>
               <Text>Subtotal</Text>
-              <Text>${totalPrice.toFixed(2)}</Text>
+              <Text>৳{totalPrice.toFixed(2)}</Text>
             </View>
 
             <View style={styles.row}>
               <Text>Shipping</Text>
-              <Text>${shipping.toFixed(2)}</Text>
+              <Text>৳{shipping.toFixed(2)}</Text>
             </View>
 
             <View style={styles.row}>
               <Text>Tax</Text>
-              <Text>${tax.toFixed(2)}</Text>
+              <Text>৳{tax.toFixed(2)}</Text>
             </View>
 
             <View style={styles.divider} />
@@ -159,7 +159,7 @@ export default function CheckoutScreen({ navigation }) {
               </Text>
 
               <Text style={styles.total}>
-                ${total.toFixed(2)}
+              ৳{total.toFixed(2)}
               </Text>
             </View>
           </View>

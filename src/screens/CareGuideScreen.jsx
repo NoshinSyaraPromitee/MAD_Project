@@ -141,7 +141,7 @@ export default function CareGuideScreen({ route, navigation }) {
             >
               <View style={styles.heroContent}>
                 <View style={styles.heroTextBlock}>
-                  <Text style={styles.heroLabel}>TODAY'S FOCUS</Text>
+          
                   <Text style={styles.heroTitle} numberOfLines={1}>
                     {plant ? plant.nickname : "Plant Care 101"}
                   </Text>
@@ -150,13 +150,6 @@ export default function CareGuideScreen({ route, navigation }) {
                   </Text>
                 </View>
 
-                {plant ? (
-                  <Image source={{ uri: plant.image }} style={styles.heroImage} />
-                ) : (
-                  <View style={styles.heroIconCircle}>
-                    <MaterialCommunityIcons name="flower-tulip" size={32} color="#FFF" />
-                  </View>
-                )}
               </View>
 
               {/* Decorative leaf shapes */}

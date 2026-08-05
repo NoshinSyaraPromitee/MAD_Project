@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  Image,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,26 +19,22 @@ export default function LandingScreen({ navigation }) {
     >
       <SafeAreaView style={styles.safeArea}>
         {/* Logo */}
-
         <View style={styles.logoContainer}>
-          
+          <Image
+            source={require("../../assets/images/Hello.gif")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
 
-          <Text style={styles.title}>
-            MyPlantPal
-          </Text>
-
-          
+          <Text style={styles.title}>MyPlantPal</Text>
         </View>
 
         {/* Get Started Button */}
-
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Login")}
         >
-          <Text style={styles.buttonText}>
-            Get Started
-          </Text>
+          <Text style={styles.buttonText}>Get Started</Text>
 
           <MaterialCommunityIcons
             name="arrow-right-circle"
@@ -66,6 +63,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
+  logo: {
+    width: 280,
+    height: 280,
+  },
+
   title: {
     fontSize: 42,
     fontWeight: "bold",
@@ -85,14 +87,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-
     backgroundColor: "#2E7D32",
-
     width: "100%",
     paddingVertical: 18,
-
     borderRadius: 20,
-
     elevation: 8,
   },
 

@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Dimensions,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,6 +15,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import myPlants from "../data/myPlants";
 import { CartContext } from "../context/CartContext";
+
+const { width } = Dimensions.get("window");
 
 const achievements = [
   { icon: "seed", label: "First Sprout", unlocked: true },
@@ -42,6 +45,8 @@ export default function ProfileScreen({ navigation }) {
       )
     : 0;
 
+  const unlockedBadges = achievements.filter((a) => a.unlocked).length;
+
   const handleLogout = () => {
     Alert.alert(
       "Log Out",
@@ -67,114 +72,99 @@ export default function ProfileScreen({ navigation }) {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={styles.container}>
+        {/* Top bar with Back + Settings */}
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="arrow-left"
+              size={24}
+              color="#2E7D32"
+            />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Profile</Text>
+
+          <TouchableOpacity
+            style={styles.settingsBtn}
+            onPress={() => navigation.navigate("Settings")}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons
+              name="cog-outline"
+              size={24}
+              color="#2E7D32"
+            />
+          </TouchableOpacity>
+        </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          contentContainerStyle={styles.scrollContent}
         >
-          {/* Header */}
-
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>
-              Profile
-            </Text>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Settings")}
+          {/* Hero Profile Card */}
+          <View style={styles.heroCard}>
+            <LinearGradient
+              colors={["#E8F5E9", "#C8E6C9"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.heroGradient}
             >
-              <MaterialCommunityIcons
-                name="cog-outline"
-                size={26}
-                color="#2E7D32"
-              />
-            </TouchableOpacity>
-          </View>
+              <View style={styles.avatarRow}>
+                <View style={styles.avatarWrap}>
+                  <View style={styles.avatar}>
+                    <MaterialCommunityIcons
+                      name="sprout"
+                      size={42}
+                      color="white"
+                    />
+                  </View>
+                  <TouchableOpacity style={styles.editBadge}>
+                    <MaterialCommunityIcons
+                      name="pencil"
+                      size={13}
+                      color="white"
+                    />
+                  </TouchableOpacity>
+                </View>
 
-          {/* Avatar Card */}
-
-          <View style={styles.avatarCard}>
-            <View style={styles.avatarWrap}>
-              <View style={styles.avatar}>
-                <MaterialCommunityIcons
-                  name="sprout"
-                  size={48}
-                  color="white"
-                />
+                <View style={styles.userInfo}>
+                  <Text style={styles.name}>Noshin</Text>
+                  <Text style={styles.subtitle}>Plant Parent since 2026</Text>
+                </View>
               </View>
 
-              <TouchableOpacity style={styles.editBadge}>
-                <MaterialCommunityIcons
-                  name="pencil"
-                  size={14}
-                  color="white"
-                />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.name}>
-              Noshin
-            </Text>
-
-            <Text style={styles.subtitle}>
-              Plant Parent since 2026
-            </Text>
-          </View>
-
-          {/* Stats */}
-
-          <View style={styles.statsContainer}>
-            <View style={styles.statCard}>
-            
-
-              <Text style={styles.statNumber}>
-                {myPlants.length}
-              </Text>
-
-              <Text style={styles.statLabel}>
-                Plants
-              </Text>
-            </View>
-
-            <View style={styles.statCard}>
-             
-
-              <Text style={styles.statNumber}>
-                {averageHealth}%
-              </Text>
-
-              <Text style={styles.statLabel}>
-                Avg Health
-              </Text>
-            </View>
-
-            <View style={styles.statCard}>
-            
-
-              <Text style={styles.statNumber}>
-                {achievements.filter((a) => a.unlocked).length}
-              </Text>
-
-              <Text style={styles.statLabel}>
-                Badges
-              </Text>
-            </View>
+              {/* Stats row inside hero */}
+              <View style={styles.statsRow}>
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{myPlants.length}</Text>
+                  <Text style={styles.statLabel}>Plants</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{averageHealth}%</Text>
+                  <Text style={styles.statLabel}>Avg Health</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={styles.statNumber}>{unlockedBadges}</Text>
+                  <Text style={styles.statLabel}>Badges</Text>
+                </View>
+              </View>
+            </LinearGradient>
           </View>
 
           {/* Achievements */}
-
-          <Text style={styles.sectionTitle}>
-            Achievements
-          </Text>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.badgeRow}
-          >
+          <Text style={styles.sectionTitle}>Achievements</Text>
+          <View style={styles.achievementsGrid}>
             {achievements.map((badge) => (
               <View
                 key={badge.label}
                 style={[
-                  styles.badge,
+                  styles.badgeCard,
                   !badge.unlocked && styles.badgeLocked,
                 ]}
               >
@@ -184,7 +174,7 @@ export default function ProfileScreen({ navigation }) {
                     {
                       backgroundColor: badge.unlocked
                         ? "#E8F5E9"
-                        : "#EEEEEE",
+                        : "#F0F0F0",
                     },
                   ]}
                 >
@@ -194,51 +184,42 @@ export default function ProfileScreen({ navigation }) {
                     color={badge.unlocked ? "#2E7D32" : "#AAAAAA"}
                   />
                 </View>
-
                 <Text
                   style={[
                     styles.badgeLabel,
                     !badge.unlocked && { color: "#AAAAAA" },
                   ]}
+                  numberOfLines={2}
                 >
                   {badge.label}
                 </Text>
               </View>
             ))}
-          </ScrollView>
+          </View>
 
-          {/* Menu */}
-
-          <Text style={styles.sectionTitle}>
-            Menu
-          </Text>
-
-          <View style={styles.menuCard}>
-            {menuItems.map((item, index) => (
+          {/* Quick Menu – 2-column grid */}
+          <Text style={styles.sectionTitle}>Quick Menu</Text>
+          <View style={styles.menuGrid}>
+            {menuItems.map((item) => (
               <TouchableOpacity
                 key={item.label}
-                style={[
-                  styles.menuRow,
-                  index === menuItems.length - 1 && {
-                    borderBottomWidth: 0,
-                  },
-                ]}
+                style={styles.menuCard}
                 onPress={() => navigation.navigate(item.route)}
+                activeOpacity={0.8}
               >
                 <View
                   style={[
                     styles.menuIconCircle,
-                    { backgroundColor: `${item.color}22` },
+                    { backgroundColor: `${item.color}18` },
                   ]}
                 >
                   <MaterialCommunityIcons
                     name={item.icon}
-                    size={20}
+                    size={22}
                     color={item.color}
                   />
                 </View>
-
-                <Text style={styles.menuLabel}>
+                <Text style={styles.menuLabel} numberOfLines={1}>
                   {item.label}
                 </Text>
 
@@ -249,31 +230,22 @@ export default function ProfileScreen({ navigation }) {
                     </Text>
                   </View>
                 )}
-
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={22}
-                  color="#BBB"
-                />
               </TouchableOpacity>
             ))}
           </View>
 
           {/* Log Out */}
-
           <TouchableOpacity
             style={styles.logoutButton}
             onPress={handleLogout}
+            activeOpacity={0.8}
           >
             <MaterialCommunityIcons
               name="logout"
               size={20}
               color="#E53935"
             />
-
-            <Text style={styles.logoutText}>
-              Log Out
-            </Text>
+            <Text style={styles.logoutText}>Log Out</Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -284,26 +256,66 @@ export default function ProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 10,
   },
 
-  header: {
+  topBar: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 20,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
+  },
+
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  settingsBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "700",
     color: "#2E7D32",
   },
 
-  avatarCard: {
+  scrollContent: {
+    paddingHorizontal: 18,
+    paddingBottom: 40,
+  },
+
+  // Hero
+  heroCard: {
+    borderRadius: 24,
+    overflow: "hidden",
+    marginBottom: 24,
+    elevation: 4,
+    shadowColor: "#2E7D32",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+  },
+
+  heroGradient: {
+    padding: 20,
+  },
+
+  avatarRow: {
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 22,
+    marginBottom: 18,
   },
 
   avatarWrap: {
@@ -311,157 +323,187 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: "#4CAF50",
     justifyContent: "center",
     alignItems: "center",
-    elevation: 5,
   },
 
   editBadge: {
     position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    bottom: -2,
+    right: -2,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     backgroundColor: "#2E7D32",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: "#FFF8EC",
+    borderColor: "#E8F5E9",
+  },
+
+  userInfo: {
+    marginLeft: 16,
+    flex: 1,
   },
 
   name: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2E7D32",
-    marginTop: 14,
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1B5E20",
   },
 
   subtitle: {
-    marginTop: 4,
-    color: "#777",
+    marginTop: 3,
+    fontSize: 13,
+    color: "#558B2F",
   },
 
-  statsContainer: {
+  statsRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 26,
+    backgroundColor: "rgba(255,255,255,0.65)",
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
   },
 
-  statCard: {
-    backgroundColor: "white",
-    width: "31%",
-    borderRadius: 18,
+  statItem: {
+    flex: 1,
     alignItems: "center",
-    paddingVertical: 16,
-    elevation: 3,
+  },
+
+  statDivider: {
+    width: 1,
+    backgroundColor: "rgba(46,125,50,0.15)",
+    marginVertical: 4,
   },
 
   statNumber: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 8,
+    fontSize: 18,
+    fontWeight: "700",
     color: "#2E7D32",
   },
 
   statLabel: {
-    color: "#888",
-    marginTop: 3,
-    fontSize: 12,
-    textAlign: "center",
+    fontSize: 11,
+    color: "#666",
+    marginTop: 2,
   },
 
+  // Sections
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "700",
     color: "#333",
-    marginBottom: 14,
+    marginBottom: 12,
   },
 
-  badgeRow: {
-    paddingBottom: 8,
-    marginBottom: 22,
+  // Achievements grid
+  achievementsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 24,
   },
 
-  badge: {
+  badgeCard: {
+    width: (width - 36 - 24) / 3,
+    backgroundColor: "white",
+    borderRadius: 16,
     alignItems: "center",
-    width: 78,
-    marginRight: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 6,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
   },
 
   badgeLocked: {
-    opacity: 0.6,
+    opacity: 0.55,
   },
 
   badgeIconCircle: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 8,
   },
 
   badgeLabel: {
-    marginTop: 8,
     fontSize: 11,
     fontWeight: "600",
     color: "#555",
     textAlign: "center",
   },
 
-  menuCard: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    marginBottom: 26,
-    elevation: 3,
+  // Menu grid
+  menuGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 28,
   },
 
-  menuRow: {
+  menuCard: {
+    width: (width - 36 - 14) / 2,
+    backgroundColor: "white",
+    borderRadius: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 14,
+    marginBottom: 14,
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F2F2F2",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
   },
 
   menuIconCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
   },
 
   menuLabel: {
     flex: 1,
-    marginLeft: 14,
-    fontSize: 15,
+    marginLeft: 12,
+    fontSize: 13,
     fontWeight: "600",
     color: "#333",
   },
 
   cartBadge: {
+    position: "absolute",
+    top: 10,
+    right: 10,
     backgroundColor: "#E53935",
     borderRadius: 10,
-    minWidth: 20,
-    height: 20,
-    paddingHorizontal: 5,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 8,
   },
 
   cartBadgeText: {
     color: "white",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "bold",
   },
 
+  // Logout
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -470,12 +512,16 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingVertical: 16,
     elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
   },
 
   logoutText: {
     marginLeft: 10,
     color: "#E53935",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "700",
   },
 });

@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  Image,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,23 +23,31 @@ export default function LoginScreen({ navigation }) {
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea}>
+        {/* Back button */}
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialCommunityIcons
+            name="arrow-left"
+            size={28}
+            color="#2E7D32"
+          />
+        </TouchableOpacity>
 
         <View style={styles.header}>
-          <MaterialCommunityIcons
-            name="flower"
-            size={70}
-            color="#2E7D32"
+          <Image
+            source={require("../../assets/images/login.gif")}
+            style={styles.logo}
+            resizeMode="contain"
           />
 
           <Text style={styles.title}>Welcome Back!</Text>
 
-          <Text style={styles.subtitle}>
-          Missing your buddies?
-          </Text>
+          <Text style={styles.subtitle}>Missing your buddies?</Text>
         </View>
 
         {/* Email */}
-
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons
             name="email-outline"
@@ -52,11 +61,11 @@ export default function LoginScreen({ navigation }) {
             onChangeText={setEmail}
             style={styles.input}
             keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
 
         {/* Password */}
-
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons
             name="lock-outline"
@@ -72,15 +81,9 @@ export default function LoginScreen({ navigation }) {
             style={styles.input}
           />
 
-          <TouchableOpacity
-            onPress={() => setHidePassword(!hidePassword)}
-          >
+          <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
             <MaterialCommunityIcons
-              name={
-                hidePassword
-                  ? "eye-off-outline"
-                  : "eye-outline"
-              }
+              name={hidePassword ? "eye-off-outline" : "eye-outline"}
               size={22}
               color="#777"
             />
@@ -88,62 +91,37 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <TouchableOpacity>
-          <Text style={styles.forgot}>
-            Forgot Password?
-          </Text>
+          <Text style={styles.forgot}>Forgot Password?</Text>
         </TouchableOpacity>
 
         {/* Login */}
-
         <TouchableOpacity
           style={styles.loginButton}
           onPress={() => navigation.replace("MainTabs")}
         >
-          <Text style={styles.loginText}>
-            Login
-          </Text>
+          <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
 
         {/* Divider */}
-
         <View style={styles.divider}>
           <View style={styles.line} />
-
           <Text style={styles.or}>OR</Text>
-
           <View style={styles.line} />
         </View>
 
         {/* Google */}
-
         <TouchableOpacity style={styles.googleButton}>
-          <MaterialCommunityIcons
-            name="google"
-            size={22}
-            color="#DB4437"
-          />
-
-          <Text style={styles.googleText}>
-            Continue with Google
-          </Text>
+          <MaterialCommunityIcons name="google" size={22} color="#DB4437" />
+          <Text style={styles.googleText}>Continue with Google</Text>
         </TouchableOpacity>
 
         <View style={styles.footer}>
-          <Text>
-            Don't have an account?
-          </Text>
+          <Text>Don't have an account?</Text>
 
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Register")
-            }
-          >
-            <Text style={styles.register}>
-              Register
-            </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+            <Text style={styles.register}>Register</Text>
           </TouchableOpacity>
         </View>
-
       </SafeAreaView>
     </LinearGradient>
   );
@@ -160,9 +138,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
   },
 
+  backButton: {
+    position: "absolute",
+    top: 10,
+    left: 25,
+    zIndex: 10,
+    padding: 5,
+  },
+
   header: {
     alignItems: "center",
     marginBottom: 40,
+  },
+
+  logo: {
+    width: 140,
+    height: 140,
   },
 
   title: {
@@ -181,17 +172,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-
     backgroundColor: "#fff",
-
     borderRadius: 15,
-
     paddingHorizontal: 15,
-
     marginBottom: 15,
-
     height: 58,
-
     elevation: 4,
   },
 
@@ -243,13 +228,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-
     backgroundColor: "#fff",
-
     height: 56,
-
     borderRadius: 15,
-
     elevation: 3,
   },
 

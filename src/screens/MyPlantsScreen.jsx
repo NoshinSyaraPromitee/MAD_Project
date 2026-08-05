@@ -43,29 +43,25 @@ export default function MyPlantsScreen({ navigation }) {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={styles.container}>
-        {/* Header */}
+      {/* Header */}
+<View style={styles.header}>
+  <TouchableOpacity onPress={() => navigation.goBack()}>
+    <MaterialCommunityIcons
+      name="arrow-left"
+      size={28}
+      color="#2E7D32"
+    />
+  </TouchableOpacity>
 
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>
-              My Green Family
-            </Text>
+  <Text style={styles.greeting}>My Green Family</Text>
 
-          </View>
-
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() =>
-              navigation.navigate("AddPlant")
-            }
-          >
-            <MaterialCommunityIcons
-              name="plus"
-              color="white"
-              size={26}
-            />
-          </TouchableOpacity>
-        </View>
+  <TouchableOpacity
+    style={styles.addButton}
+    onPress={() => navigation.navigate("AddPlant")}
+  >
+    <MaterialCommunityIcons name="plus" color="white" size={26} />
+  </TouchableOpacity>
+</View>
 
         {/* Search */}
 

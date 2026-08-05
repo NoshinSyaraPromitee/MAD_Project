@@ -19,6 +19,10 @@ export default function WishlistScreen({ navigation }) {
   const { wishlistItems, removeFromWishlist } = useContext(WishlistContext);
   const { addToCart } = useContext(CartContext);
 
+  const goToShop = () => {
+    navigation.navigate("MainTabs", { screen: "Shop" });
+  };
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
@@ -52,7 +56,7 @@ export default function WishlistScreen({ navigation }) {
         </View>
 
         <Text style={styles.price}>
-          ${item.price.toFixed(2)}
+          ৳{item.price.toFixed(2)}
         </Text>
 
         <View style={styles.actionsRow}>
@@ -128,7 +132,7 @@ export default function WishlistScreen({ navigation }) {
 
             <TouchableOpacity
               style={styles.shopButton}
-              onPress={() => navigation.navigate("Shop")}
+              onPress={goToShop}
             >
               <Text style={styles.shopText}>
                 Browse Shop

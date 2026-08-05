@@ -27,6 +27,10 @@ export default function CartScreen({ navigation }) {
   const tax = totalPrice * 0.05;
   const grandTotal = totalPrice + shipping + tax;
 
+  const goToShop = () => {
+    navigation.navigate("MainTabs", { screen: "Shop" });
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image
@@ -108,13 +112,10 @@ export default function CartScreen({ navigation }) {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-
         {/* Header */}
 
         <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-          >
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <MaterialCommunityIcons
               name="arrow-left"
               size={28}
@@ -143,9 +144,7 @@ export default function CartScreen({ navigation }) {
 
             <TouchableOpacity
               style={styles.shopButton}
-              onPress={() =>
-                navigation.navigate("Shop")
-              }
+              onPress={goToShop}
             >
               <Text style={styles.shopText}>
                 Continue Shopping

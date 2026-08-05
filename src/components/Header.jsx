@@ -8,9 +8,7 @@ export default function Header() {
 
       <Text style={styles.name}>Noshin</Text>
 
-      <Text style={styles.subtitle}>
-       Ready to start the day ?
-      </Text>
+      
     </View>
   );
 }

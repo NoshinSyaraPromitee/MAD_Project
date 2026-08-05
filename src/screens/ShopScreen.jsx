@@ -49,14 +49,24 @@ export default function ShopScreen({ navigation }) {
         {/* Header */}
 
         <View style={styles.header}>
-          <View>
-            <Text style={styles.smallText}>
-               Store
-            </Text>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+            >
+              <MaterialCommunityIcons
+                name="arrow-left"
+                size={28}
+                color="#2E7D32"
+              />
+            </TouchableOpacity>
 
-            <Text style={styles.title}>
-              Find Your necessary gardening equipment
-            </Text>
+            <View>
+              <Text style={styles.smallText}>Store</Text>
+              <Text style={styles.title}>
+                Find Your necessary gardening equipment
+              </Text>
+            </View>
           </View>
 
           <View style={styles.headerIcons}>
@@ -208,6 +218,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 15,
     marginBottom: 20,
+  },
+
+  headerLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+
+  backButton: {
+    marginRight: 12,
+    padding: 4,
   },
 
   headerIcons: {

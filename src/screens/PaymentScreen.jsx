@@ -7,6 +7,8 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
+  ActivityIndicator,
+  Modal,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,6 +22,8 @@ export default function PaymentScreen({ route, navigation }) {
   const { clearCart } = useContext(CartContext);
 
   const [selectedPayment, setSelectedPayment] = useState("Card");
+  const [processing, setProcessing] = useState(false);
+  const [resultModal, setResultModal] = useState(null); // null | "success" | "failed"
 
   const paymentMethods = [
     {
@@ -49,20 +53,42 @@ export default function PaymentScreen({ route, navigation }) {
   ];
 
   const handlePayment = () => {
-    Alert.alert(
-      "Payment Successful",
-      "Your order has been placed successfully!",
-      [
-        {
-          text: "OK",
-          onPress: () => {
-            clearCart();
+    if (processing) return;
 
-            navigation.replace("OrderSuccess");
-          },
-        },
-      ]
-    );
+    setProcessing(true);
+
+    // Simulate payment processing (1.5 seconds)
+    setTimeout(() => {
+      setProcessing(false);
+
+      // Always succeed for demo (change to Math.random() > 0.2 for random fail)
+      const success = true;
+if (success) {
+  setResultModal("success");
+  Alert.alert(
+    "✅ Payment Successful",
+    `\n\nYour payment of ৳${total.toFixed(2)} via ${selectedPayment} was successful. Your order has been placed!`,
+    [{ text: "OK" }]
+  );
+}else {
+        setResultModal("failed");
+        Alert.alert(
+          "❌ Payment Failed",
+          "Something went wrong while processing your payment. Please try again or choose another method.",
+          [{ text: "OK" }]
+        );
+      }
+    }, 1500);
+  };
+
+  const onSuccessContinue = () => {
+    setResultModal(null);
+    clearCart();
+    navigation.replace("OrderSuccess");
+  };
+
+  const onFailedRetry = () => {
+    setResultModal(null);
   };
 
   return (
@@ -71,15 +97,11 @@ export default function PaymentScreen({ route, navigation }) {
       style={{ flex: 1 }}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={styles.container}
-        >
+        <ScrollView contentContainerStyle={styles.container}>
           {/* Header */}
 
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-            >
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <MaterialCommunityIcons
                 name="arrow-left"
                 size={28}
@@ -87,9 +109,7 @@ export default function PaymentScreen({ route, navigation }) {
               />
             </TouchableOpacity>
 
-            <Text style={styles.title}>
-              Payment
-            </Text>
+            <Text style={styles.title}>Payment</Text>
 
             <View style={{ width: 28 }} />
           </View>
@@ -103,84 +123,158 @@ export default function PaymentScreen({ route, navigation }) {
               size={40}
             />
 
-            <View style={{ marginLeft: 15 }}>
-              <Text style={styles.secureTitle}>
-                Secure Checkout
-              </Text>
-
+            <View style={{ marginLeft: 15, flex: 1 }}>
+              <Text style={styles.secureTitle}>Secure Checkout</Text>
               <Text style={styles.secureText}>
-                All payments are encrypted.
+                Your payment information is encrypted and secure.
               </Text>
             </View>
           </View>
 
           {/* Payment Methods */}
 
-          <Text style={styles.sectionTitle}>
-            Choose Payment Method
-          </Text>
+          <Text style={styles.sectionTitle}>Select Payment Method</Text>
 
-          {paymentMethods.map((item) => (
+          {paymentMethods.map((method) => (
             <TouchableOpacity
-              key={item.id}
+              key={method.id}
               style={[
                 styles.paymentCard,
-                selectedPayment === item.value &&
-                  styles.selected,
+                selectedPayment === method.value && styles.selected,
               ]}
-              onPress={() =>
-                setSelectedPayment(item.value)
-              }
+              onPress={() => setSelectedPayment(method.value)}
+              activeOpacity={0.8}
             >
               <MaterialCommunityIcons
-                name={item.icon}
+                name={method.icon}
                 size={28}
-                color="#2E7D32"
+                color={
+                  selectedPayment === method.value ? "#2E7D32" : "#666"
+                }
               />
 
-              <Text style={styles.paymentText}>
-                {item.title}
-              </Text>
+              <Text style={styles.paymentText}>{method.title}</Text>
 
-              {selectedPayment === item.value && (
+              {selectedPayment === method.value && (
                 <MaterialCommunityIcons
                   name="check-circle"
-                  color="#2E7D32"
                   size={24}
+                  color="#2E7D32"
                 />
               )}
             </TouchableOpacity>
           ))}
 
-          {/* Order Summary */}
+          {/* Order Total */}
 
           <View style={styles.summary}>
-            <Text style={styles.summaryTitle}>
-              Order Total
-            </Text>
+            <Text style={styles.summaryTitle}>Order Total</Text>
 
-            <Text style={styles.total}>
-              ${total.toFixed(2)}
-            </Text>
+            <Text style={styles.total}>৳{total.toFixed(2)}</Text>
           </View>
 
           {/* Pay Button */}
 
           <TouchableOpacity
-            style={styles.payButton}
+            style={[styles.payButton, processing && styles.payButtonDisabled]}
             onPress={handlePayment}
+            disabled={processing}
+            activeOpacity={0.85}
           >
-            <MaterialCommunityIcons
-              name="lock"
-              size={20}
-              color="white"
-            />
-
-            <Text style={styles.payText}>
-              Pay ${total.toFixed(2)}
-            </Text>
+            {processing ? (
+              <>
+                <ActivityIndicator color="white" size="small" />
+                <Text style={styles.payText}>Processing...</Text>
+              </>
+            ) : (
+              <>
+                <MaterialCommunityIcons name="lock" size={20} color="white" />
+                <Text style={styles.payText}>
+                  Pay ৳{total.toFixed(2)}
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         </ScrollView>
+
+        {/* Result Modal */}
+
+        <Modal
+          visible={resultModal !== null}
+          transparent
+          animationType="fade"
+          onRequestClose={() => {
+            if (resultModal === "failed") setResultModal(null);
+          }}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              <View
+                style={[
+                  styles.modalIconCircle,
+                  {
+                    backgroundColor:
+                      resultModal === "success" ? "#E8F5E9" : "#FFEBEE",
+                  },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name={
+                    resultModal === "success"
+                      ? "check-circle"
+                      : "close-circle"
+                  }
+                  size={56}
+                  color={resultModal === "success" ? "#2E7D32" : "#E53935"}
+                />
+              </View>
+
+              <Text style={styles.modalTitle}>
+                {resultModal === "success"
+                  ? "Payment Successful!"
+                  : "Payment Failed"}
+              </Text>
+
+              <Text style={styles.modalMessage}>
+                {resultModal === "success"
+                  ? `Your payment of ৳${total.toFixed(
+                      2
+                    )} via ${selectedPayment} was completed successfully. Your order has been placed.`
+                  : "We could not process your payment. Please try again or choose a different payment method."}
+              </Text>
+
+              {resultModal === "success" ? (
+                <TouchableOpacity
+                  style={styles.modalPrimaryBtn}
+                  onPress={onSuccessContinue}
+                >
+                  <Text style={styles.modalPrimaryText}>View Order</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.modalPrimaryBtn}
+                  onPress={onFailedRetry}
+                >
+                  <Text style={styles.modalPrimaryText}>Try Again</Text>
+                </TouchableOpacity>
+              )}
+
+              {resultModal === "failed" && (
+                <TouchableOpacity
+                  style={styles.modalSecondaryBtn}
+                  onPress={() => {
+                    setResultModal(null);
+                    navigation.goBack();
+                  }}
+                >
+                  <Text style={styles.modalSecondaryText}>
+                    Change Payment Method
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -189,6 +283,7 @@ export default function PaymentScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    paddingBottom: 40,
   },
 
   header: {
@@ -283,10 +378,84 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
 
+  payButtonDisabled: {
+    backgroundColor: "#81C784",
+  },
+
   payText: {
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
     marginLeft: 10,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+
+  modalCard: {
+    backgroundColor: "white",
+    borderRadius: 24,
+    padding: 28,
+    width: "100%",
+    maxWidth: 360,
+    alignItems: "center",
+  },
+
+  modalIconCircle: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 18,
+  },
+
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#222",
+    textAlign: "center",
+  },
+
+  modalMessage: {
+    marginTop: 12,
+    fontSize: 15,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+
+  modalPrimaryBtn: {
+    marginTop: 24,
+    backgroundColor: "#2E7D32",
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    width: "100%",
+    alignItems: "center",
+  },
+
+  modalPrimaryText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
+  modalSecondaryBtn: {
+    marginTop: 12,
+    paddingVertical: 12,
+    width: "100%",
+    alignItems: "center",
+  },
+
+  modalSecondaryText: {
+    color: "#2E7D32",
+    fontWeight: "600",
+    fontSize: 15,
   },
 });
