@@ -8,7 +8,7 @@ const products = [
     stock: 25,
     description:
       "Healthy mango sapling suitable for home gardens and orchards.",
-    image: "https://images.unsplash.com/photo-1591073113125-e46713c829ed?w=600",
+    image: "https://tse1.mm.bing.net/th/id/OIP.aKKuxXGe4WgCMzqtlKydwQHaJ4?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -19,7 +19,7 @@ const products = [
     rating: 4.8,
     stock: 20,
     description: "High-yield guava plant that grows well in Bangladesh.",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600",
+    image: "https://tse1.mm.bing.net/th/id/OIP.6KLpPBiWRiD7WrGOsU_abgHaJ4?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -31,7 +31,7 @@ const products = [
     stock: 40,
     description:
       "Traditional terracotta pot ideal for indoor and outdoor plants.",
-    image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=600",
+    image: "https://tse1.explicit.bing.net/th/id/OIP.xrpSKcFpbdd7xU5cEwQMhAHaGV?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -43,7 +43,7 @@ const products = [
     stock: 60,
     description:
       "Organic vermicompost that improves soil fertility and plant growth.",
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600",
+    image: "https://tse1.mm.bing.net/th/id/OIP.KE5ma4NIt2pDZuzlyq9k5QHaE7?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -54,7 +54,7 @@ const products = [
     rating: 4.8,
     stock: 18,
     description: "Durable watering can for everyday gardening and plant care.",
-    image: "https://images.unsplash.com/photo-1615485291234-9fbc8b67452d?w=600",
+    image: "https://i5.walmartimages.com/seo/Wzzjkit-Watering-Can-Indoor-Plants-Long-Spout-Watering-Can-Outdoor-Flower-Patterns-Indoor-Watering-Can-Handle-Plastic-Plant-Watering-Can-Garden-Plant_8b273477-c2d8-4206-a62f-7fda0970bea1.033b96f50e8577101a2e19aef847748f.jpeg",
   },
 
   {
@@ -66,7 +66,7 @@ const products = [
     stock: 120,
     description:
       "High-quality BRRI rice seeds suitable for cultivation in Bangladesh.",
-    image: "https://images.unsplash.com/photo-1536053299134-5d3f31b8dff4?w=600",
+    image: "https://tse1.mm.bing.net/th/id/OIP.08MlnJZ9eldrFpuqLb3dyAHaHa?r=0&w=500&h=500&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -77,7 +77,7 @@ const products = [
     rating: 4.8,
     stock: 15,
     description: "Healthy jackfruit sapling with excellent fruit production.",
-    image: "https://images.unsplash.com/photo-1598511727991-ed7b7c063a5f?w=600",
+    image: "https://tse3.mm.bing.net/th/id/OIP.iiJe4qvpuxYEw8wZUifv6wAAAA?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -88,7 +88,7 @@ const products = [
     rating: 4.7,
     stock: 18,
     description: "Young coconut tree ideal for tropical home gardens.",
-    image: "https://images.unsplash.com/photo-1502741338009-cac2772e18bc?w=600",
+    image: "https://tse3.mm.bing.net/th/id/OIP.jTzhtW9of4tLbLOFmvghPgHaFj?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -99,7 +99,7 @@ const products = [
     rating: 4.8,
     stock: 150,
     description: "Premium bottle gourd seeds with high germination rate.",
-    image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600",
+    image: "https://tse3.mm.bing.net/th/id/OIP.ekeKp73pv8IenMO4ixAhEAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 
   {
@@ -111,7 +111,7 @@ const products = [
     stock: 35,
     description:
       "Strong steel trowel for digging, transplanting, and gardening tasks.",
-    image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600",
+    image: "https://tse3.mm.bing.net/th/id/OIP.aJ5M5laNeU4wfYrk-mVYtQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
 ];
 
