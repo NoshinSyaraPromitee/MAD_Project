@@ -1,107 +1,124 @@
-// ===============================
-// src/screens/AIChatScreen.jsx
-// ===============================
-
-import React from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { useState } from "react";
 import {
-SafeAreaView,
-StyleSheet,
-Text,
-TextInput,
-TouchableOpacity,
-View
+    ActivityIndicator,
+    FlatList,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    View
 } from "react-native";
 
-import {LinearGradient} from "expo-linear-gradient";
+import ChatBubble from "../components/ChatBubble.jsx";
+import ChatInput from "../components/ChatInput.jsx";
+import { analyzePlantImage, getBotResponse } from "../services/chatApi";
 
-export default function AIChatScreen(){
+export default function AIChatScreen() {
+  const [messages, setMessages] = useState([
+    {
+      id: "1",
+      sender: "bot",
+      text: "Hello! I'm PlantBot.\nHow can I help your plants today?",
+      suggestedChips: [
+        "Why are my leaves yellow?",
+        "Homemade Banana Fertilizer",
+        "Treat Leaf Spot"
+      ]
+    }
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
 
-return(
+  const handleSend = async ({ text, imageUri }) => {
+    if (!text?.trim() && !imageUri) return;
 
-<LinearGradient
-colors={["#FFF7E7","#E8FFD8","#FFF8EC"]}
-style={{flex:1}}
->
+    const userMsg = {
+      id: String(Date.now()),
+      sender: "user",
+      text: text?.trim() || (imageUri ? "📷 Photo sent" : ""),
+      imageUri: imageUri || null
+    };
 
-<SafeAreaView style={styles.container}>
+    setMessages((prev) => [userMsg, ...prev]);
+    setIsTyping(true);
 
-<View style={styles.chat}>
+    try {
+      const botMsg = imageUri
+        ? await analyzePlantImage(imageUri, text?.trim())
+        : await getBotResponse(text.trim());
 
-<Text style={styles.bot}>
-🌿 Hello! I'm PlantBot.
-</Text>
+      setMessages((prev) => [botMsg, ...prev]);
+    } catch (error) {
+      console.error("Error getting bot response:", error);
+      setMessages((prev) => [
+        {
+          id: String(Date.now() + 1),
+          sender: "bot",
+          text: "Something went wrong on my end. Please try again."
+        },
+        ...prev
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
-<Text style={styles.reply}>
-How can I help your plants today?
-</Text>
+  const handleChipPress = (chipText) => {
+    handleSend({ text: chipText, imageUri: null });
+  };
 
-</View>
+  return (
+    <LinearGradient
+      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
+      style={styles.gradientContainer}
+    >
+      <SafeAreaView style={styles.container}>
+        {/* Chat Feed */}
+        <FlatList
+          data={messages}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ChatBubble message={item} onChipPress={handleChipPress} />
+          )}
+          inverted
+          contentContainerStyle={styles.listContent}
+        />
 
-<View style={styles.bottom}>
+        {isTyping && (
+          <View style={styles.typingBox}>
+            <ActivityIndicator size="small" color="#2E7D32" />
+            <Text style={styles.typingText}>PlantBot is analyzing...</Text>
+          </View>
+        )}
 
-<TextInput
-placeholder="Ask anything..."
-style={styles.input}
-/>
-
-<TouchableOpacity style={styles.send}>
-
-<Text style={{color:"#fff"}}>➤</Text>
-
-</TouchableOpacity>
-
-</View>
-
-</SafeAreaView>
-
-</LinearGradient>
-
-)
-
+        {/* Modular Input Bar (+ Icon, Image Preview, & Send Button) */}
+        <ChatInput onSendMessage={handleSend} />
+      </SafeAreaView>
+    </LinearGradient>
+  );
 }
 
-const styles=StyleSheet.create({
-
-container:{
-flex:1,
-justifyContent:"space-between",
-padding:20
-},
-
-chat:{
-backgroundColor:"#fff",
-padding:20,
-borderRadius:20
-},
-
-bot:{
-fontWeight:"bold",
-fontSize:18,
-marginBottom:10
-},
-
-reply:{
-fontSize:16
-},
-
-bottom:{
-flexDirection:"row"
-},
-
-input:{
-flex:1,
-backgroundColor:"#fff",
-borderRadius:15,
-paddingHorizontal:15
-},
-
-send:{
-marginLeft:10,
-backgroundColor:"#2E7D32",
-width:55,
-justifyContent:"center",
-alignItems:"center",
-borderRadius:15
-}
-
+const styles = StyleSheet.create({
+  gradientContainer: {
+    flex: 1
+  },
+  container: {
+    flex: 1,
+    justifyContent: "space-between"
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 12
+  },
+  typingBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 8
+  },
+  typingText: {
+    fontSize: 13,
+    color: "#7A7A7A",
+    marginLeft: 8,
+    fontWeight: "500"
+  }
 });
