@@ -5,6 +5,13 @@ const User = require('../model/user');
 
 const router = express.Router();
 
+// Short-lived holding area: sessionId -> appToken. The final redirect back
+// into the app doesn't reliably carry query params through Expo Go's deep
+// link handling, so instead of putting the token in the URL, we stash it
+// here and let the app fetch it right after the browser closes.
+const pendingSessions = new Map();
+const SESSION_TTL_MS = 5 * 60 * 1000; // 5 minutes — plenty for the round trip
+
 // This MUST exactly match the "Authorized redirect URI" you registered
 // in Google Cloud Console for this client.
 const REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/auth/google/callback';
@@ -18,11 +25,16 @@ const oauthClient = new OAuth2Client(
 // GET /auth/google/callback?code=...
 // Google redirects here after the user approves the login in the browser.
 router.get('/google/callback', async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
 
   if (!code) {
     return res.status(400).send('Missing authorization code');
   }
+
+  // The app sends its own redirect URI (exp://<ip>:<port>/...) as `state`
+  // when it kicks off the login. This avoids hardcoding it in .env, since
+  // that URI changes every time the dev machine's IP/network changes.
+  const appRedirect = state ? decodeURIComponent(state) : process.env.APP_REDIRECT_URI;
 
   try {
     // Exchange the one-time code for Google tokens (server-to-server, uses client secret)
@@ -50,25 +62,39 @@ router.get('/google/callback', async (req, res) => {
       { expiresIn: '30d' }
     );
 
-    // Bounce the browser back into the Expo app, carrying the token.
-    // APP_REDIRECT_URI must be the redirect URI expo-auth-session's
-    // AuthSession.makeRedirectUri() produced on the app side.
-    // In Expo Go during dev this looks like: exp://192.168.x.x:8081/--/auth
-    // Set it in .env once you know your dev machine's LAN IP; it changes
-    // per network, so you'll update this occasionally during development.
-    const appRedirect = process.env.APP_REDIRECT_URI;
-
+    // Stash the token under the sessionId the app sent as `state`, then
+    // redirect the browser back with no sensitive data in the URL at all.
     if (!appRedirect) {
-      // Fallback so you can at least confirm the exchange worked while wiring
-      // up the frontend — shows the token instead of redirecting.
-      return res.json({ warning: 'APP_REDIRECT_URI not set in .env', token: appToken, user });
+      // No state passed and no fallback set — show the token as JSON so you
+      // can still test this route by hand.
+      return res.json({ warning: 'No redirect target (state or APP_REDIRECT_URI)', token: appToken, user });
     }
 
-    return res.redirect(`${appRedirect}?token=${appToken}`);
+    if (state) {
+      pendingSessions.set(state, appToken);
+      setTimeout(() => pendingSessions.delete(state), SESSION_TTL_MS);
+    }
+
+    return res.redirect(appRedirect);
   } catch (err) {
     console.error('Google auth error:', err);
     return res.status(500).send('Authentication failed');
   }
+});
+
+// GET /auth/google/session/:sessionId
+// The app polls this right after the in-app browser closes, to retrieve
+// the token the callback above stashed. Single-use — deleted once read.
+router.get('/google/session/:sessionId', (req, res) => {
+  const { sessionId } = req.params;
+  const token = pendingSessions.get(sessionId);
+
+  if (!token) {
+    return res.status(404).json({ error: 'Session not found or already used' });
+  }
+
+  pendingSessions.delete(sessionId);
+  return res.json({ token });
 });
 
 module.exports = router;

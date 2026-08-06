@@ -11,11 +11,31 @@ import {
 
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hidePassword, setHidePassword] = useState(true);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { loginWithGoogle } = useAuth();
+
+  const handleGoogleLogin = async () => {
+    alert("Button pressed"); // TEMPORARY — remove once confirmed working
+    setGoogleLoading(true);
+    try {
+      const result = await loginWithGoogle();
+      if (result.success) {
+        navigation.replace("MainTabs");
+      }
+      // result.success === false means cancelled or failed silently —
+      // nothing to navigate, user stays on this screen.
+    } catch (err) {
+      console.error("Google login failed:", err);
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   return (
     <LinearGradient
@@ -110,9 +130,15 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         {/* Google */}
-        <TouchableOpacity style={styles.googleButton}>
+        <TouchableOpacity
+          style={styles.googleButton}
+          onPress={handleGoogleLogin}
+          disabled={googleLoading}
+        >
           <MaterialCommunityIcons name="google" size={22} color="#DB4437" />
-          <Text style={styles.googleText}>Continue with Google</Text>
+          <Text style={styles.googleText}>
+            {googleLoading ? "Signing in..." : "Continue with Google"}
+          </Text>
         </TouchableOpacity>
 
         <View style={styles.footer}>
