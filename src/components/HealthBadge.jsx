@@ -1,47 +1,40 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { Text, View } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export default function HealthBadge({ health }) {
-  let color = "#43A047";
-  let text = "Healthy";
+import { healthColors } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { BULLET } from "../utils/format";
+import { themed } from "../theme/themed";
 
-  if (health < 85) {
-    color = "#FB8C00";
-    text = "Needs Care";
-  }
+export function healthInfo(health) {
+  if (health < 60) return { color: healthColors.critical, text: "Critical" };
+  if (health < 85) return { color: healthColors.needsCare, text: "Needs Care" };
+  return { color: healthColors.thriving, text: "Healthy" };
+}
 
-  if (health < 60) {
-    color = "#E53935";
-    text = "Critical";
-  }
+export default function HealthBadge({ health, style }) {
+  const { color, text } = healthInfo(health);
 
   return (
-    <View
-      style={[
-        styles.badge,
-        {
-          backgroundColor: color,
-        },
-      ]}
-    >
-      <Text style={styles.text}>
-        {health}% • {text}
+    <View style={[styles.badge, { backgroundColor: `${color}22`, borderColor: `${color}55` }, style]}>
+      <MaterialCommunityIcons name="heart-pulse" size={14} color={color} />
+      <Text style={[inter(12, "700", color), styles.text]}>
+        {health}% {BULLET} {text}
       </Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   badge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
     alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    borderWidth: 1,
   },
-
-  text: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 12,
-  },
-});
+  text: { marginLeft: 5 },
+}));

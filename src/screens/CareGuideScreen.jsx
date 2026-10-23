@@ -1,22 +1,25 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  StatusBar,
-} from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import AppScreen from "../components/AppScreen";
+import AppCard from "../components/AppCard";
+import SectionTitle from "../components/SectionTitle";
+import RiveMascot from "../components/RiveMascot";
+import { palette, creamA, tealA } from "../theme/colors";
+import { fredoka, inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { themed } from "../theme/themed";
+
+const DEG = "\u00B0";
+const DASH = "\u2013";
+
 const defaultGuide = {
-  species: "Category – General Houseplant",
+  species: `Category ${DASH} General Houseplant`,
   water: "Twice a week",
   sunlight: "Bright indirect light",
-  temperature: "20°C – 28°C",
+  temperature: `20${DEG}C ${DASH} 28${DEG}C`,
   fertilizer: "Every 2 weeks",
   humidity: "60%",
 };
@@ -25,25 +28,28 @@ const proTips = [
   "Rotate your plant a quarter turn every week so it grows evenly toward the light.",
   "Let the top inch of soil dry out before watering again to avoid root rot.",
   "Wipe leaves with a damp cloth monthly so they can breathe and photosynthesize better.",
-  "Repot every 12–18 months into a pot just one size larger than the current one.",
+  `Repot every 12${DASH}18 months into a pot just one size larger than the current one.`,
 ];
 
 const commonProblems = [
   {
     icon: "alert-circle-outline",
-    color: "#E53935",
+    color: "#E53935", // red
+    ink: "#FFFFFF",
     title: "Yellow leaves",
     fix: "Usually overwatering. Let soil dry out more between waterings.",
   },
   {
     icon: "fire",
-    color: "#FB8C00",
+    color: "#F6C026", // yellow
+    ink: "#3B2A00",
     title: "Brown, crispy tips",
     fix: "Low humidity or too much direct sun. Mist leaves or move away from windows.",
   },
   {
     icon: "arrow-down-bold-circle-outline",
-    color: "#5C6BC0",
+    color: "#1E88E5", // blue
+    ink: "#FFFFFF",
     title: "Drooping stems",
     fix: "Thirsty plant or shock from a recent move. Water thoroughly and give it a few days.",
   },
@@ -57,7 +63,7 @@ const defaultDailyTasks = [
   { icon: "magnify-scan", label: "Look for pests or yellow leaves" },
 ];
 
-export default function CareGuideScreen({ route, navigation }) {
+export default function CareGuideScreen({ route }) {
   const plant = route?.params?.plant;
   const [checkedTasks, setCheckedTasks] = useState({});
 
@@ -71,12 +77,8 @@ export default function CareGuideScreen({ route, navigation }) {
       ]
     : defaultDailyTasks;
 
-  const toggleTask = (index) => {
-    setCheckedTasks((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
+  const toggleTask = (index) =>
+    setCheckedTasks((prev) => ({ ...prev, [index]: !prev[index] }));
 
   const completedCount = dailyTasks.filter((_, i) => checkedTasks[i]).length;
   const progress = completedCount / dailyTasks.length;
@@ -86,468 +88,253 @@ export default function CareGuideScreen({ route, navigation }) {
         species: plant.species,
         water: plant.waterLevel,
         sunlight: plant.sunlight,
-        temperature: "20°C – 28°C",
+        temperature: defaultGuide.temperature,
         fertilizer: plant.fertilizer,
         humidity: plant.humidity,
       }
     : defaultGuide;
 
   const essentials = [
-    { icon: "water", color: "#42A5F5", label: "Water", value: guide.water },
-    { icon: "white-balance-sunny", color: "#FFB300", label: "Sunlight", value: guide.sunlight },
+    { icon: "water", color: palette.waterBlue, label: "Water", value: guide.water },
+    { icon: "white-balance-sunny", color: palette.sunAmber, label: "Sunlight", value: guide.sunlight },
     { icon: "thermometer", color: "#E53935", label: "Temp", value: guide.temperature },
     { icon: "leaf", color: "#43A047", label: "Fertilizer", value: guide.fertilizer },
     { icon: "water-percent", color: "#00ACC1", label: "Humidity", value: guide.humidity },
   ];
 
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={{ flex: 1 }}
-    >
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backBtn}
-            activeOpacity={0.7}
-          >
-            <MaterialCommunityIcons name="arrow-left" size={22} color="#2E7D32" />
-          </TouchableOpacity>
-
-          <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>Care Guide</Text>
-            <View style={styles.headerDot} />
-          </View>
-
-          <View style={styles.headerRight}>
-            <MaterialCommunityIcons name="sprout" size={20} color="#2E7D32" />
-          </View>
+    <AppScreen title="Care Guide" scroll>
+      {/* Hero */}
+      <LinearGradient
+        colors={[palette.teal, palette.tealLight]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.hero}
+      >
+        <View style={styles.flex}>
+          <Text style={inter(11, "700", creamA(0.75), { letterSpacing: 1.2 })}>CARE GUIDE</Text>
+          <Text style={[fredoka(26, "700", palette.cream), styles.mt4]} numberOfLines={1}>
+            {plant ? plant.nickname : "Plant Care 101"}
+          </Text>
+          <Text style={inter(13, "600", creamA(0.85))} numberOfLines={1}>
+            {guide.species}
+          </Text>
         </View>
+        <View style={styles.heroMascot}>
+          <RiveMascot width={84} />
+        </View>
+      </LinearGradient>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.content}
-        >
-          {/* Hero – overlapping style */}
-          <View style={styles.heroWrap}>
-            <LinearGradient
-              colors={["#2E7D32", "#43A047"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.hero}
+      {/* Daily challenge */}
+      <SectionTitle
+        title="Today's Care Challenge"
+        right={
+          <View style={styles.progressPill}>
+            <Text style={inter(12, "800", palette.accent)}>
+              {completedCount}/{dailyTasks.length}
+            </Text>
+          </View>
+        }
+      />
+
+      <View style={styles.track}>
+        <View style={[styles.fill, { width: `${progress * 100}%` }]} />
+      </View>
+
+      <AppCard padding={12}>
+        {dailyTasks.map((task, index) => {
+          const done = !!checkedTasks[index];
+          return (
+            <Pressable
+              key={task.label}
+              style={[styles.taskRow, done && styles.taskRowDone]}
+              onPress={() => toggleTask(index)}
             >
-              <View style={styles.heroContent}>
-                <View style={styles.heroTextBlock}>
-          
-                  <Text style={styles.heroTitle} numberOfLines={1}>
-                    {plant ? plant.nickname : "Plant Care 101"}
-                  </Text>
-                  <Text style={styles.heroSubtitle} numberOfLines={1}>
-                    {guide.species}
-                  </Text>
-                </View>
-
+              <View style={[styles.checkbox, done && styles.checkboxOn]}>
+                {done ? <MaterialCommunityIcons name="check" size={14} color={palette.cream} /> : null}
               </View>
-
-              {/* Decorative leaf shapes */}
-              <View style={styles.heroDecor1} />
-              <View style={styles.heroDecor2} />
-            </LinearGradient>
-          </View>
-
-          {/* Daily Challenge */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today's Care Challenge</Text>
-            <View style={styles.progressPill}>
-              <Text style={styles.progressPillText}>
-                {completedCount}/{dailyTasks.length}
-              </Text>
-            </View>
-          </View>
-
-          {/* Progress bar */}
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-          </View>
-
-          <View style={styles.challengeCard}>
-            {dailyTasks.map((task, index) => {
-              const done = !!checkedTasks[index];
-              return (
-                <TouchableOpacity
-                  key={task.label}
-                  style={[
-                    styles.taskRow,
-                    done && styles.taskRowDone,
-                    index === dailyTasks.length - 1 && { marginBottom: 0 },
-                  ]}
-                  activeOpacity={0.75}
-                  onPress={() => toggleTask(index)}
-                >
-                  <View style={[styles.checkbox, done && styles.checkboxChecked]}>
-                    {done && (
-                      <MaterialCommunityIcons name="check" size={14} color="#FFF" />
-                    )}
-                  </View>
-
-                  <View style={[styles.taskIconWrap, done && { backgroundColor: "#F0F0F0" }]}>
-                    <MaterialCommunityIcons
-                      name={task.icon}
-                      size={18}
-                      color={done ? "#AAA" : "#2E7D32"}
-                    />
-                  </View>
-
-                  <Text style={[styles.taskText, done && styles.taskTextDone]}>
-                    {task.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-
-            {completedCount === dailyTasks.length && (
-              <View style={styles.doneBanner}>
-                <MaterialCommunityIcons name="party-popper" size={18} color="#2E7D32" />
-                <Text style={styles.doneText}>All done! Your plant is thriving today.</Text>
+              <View style={styles.taskIcon}>
+                <MaterialCommunityIcons
+                  name={task.icon}
+                  size={18}
+                  color={done ? palette.textMuted : palette.accent}
+                />
               </View>
-            )}
-          </View>
-
-          {/* Essentials – staggered 2+3 layout feel */}
-          <Text style={styles.sectionTitle}>Essentials</Text>
-
-          <View style={styles.essentialsGrid}>
-            {essentials.map((item, i) => (
-              <View
-                key={item.label}
+              <Text
                 style={[
-                  styles.essentialCard,
-                  i === 0 || i === 1 ? styles.essentialWide : styles.essentialNarrow,
+                  inter(14, "600", done ? palette.textMuted : palette.textDark),
+                  styles.flex,
+                  done && styles.strike,
                 ]}
               >
-                <View style={[styles.essentialIcon, { backgroundColor: `${item.color}18` }]}>
+                {task.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+
+        {completedCount === dailyTasks.length ? (
+          <View style={styles.doneBanner}>
+            <MaterialCommunityIcons name="party-popper" size={18} color={palette.accent} />
+            <Text style={[inter(13, "700", palette.accent), styles.flex, styles.ml8]}>
+              All done! Your plant is thriving today.
+            </Text>
+          </View>
+        ) : null}
+      </AppCard>
+
+      {/* Essentials */}
+      <SectionTitle title="Essentials" />
+      <View style={styles.grid}>
+        {essentials.map((item, i) => {
+          const wide = i < 2;
+          return (
+            <AppCard
+              key={item.label}
+              padding={12}
+              style={[styles.essential, wide ? styles.wide : styles.narrow]}
+            >
+              <View style={wide ? styles.row : styles.centerCol}>
+                <View style={[styles.essIcon, { backgroundColor: `${item.color}22` }, !wide && styles.mb6]}>
                   <MaterialCommunityIcons name={item.icon} size={22} color={item.color} />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.essentialLabel}>{item.label}</Text>
-                  <Text style={styles.essentialValue} numberOfLines={2}>
+                <View style={wide ? styles.flex : styles.centerCol}>
+                  <Text style={inter(11, "600", palette.textMuted)}>{item.label}</Text>
+                  <Text
+                    style={[inter(13, "800", palette.textDark), !wide && styles.centerText]}
+                    numberOfLines={2}
+                  >
                     {item.value}
                   </Text>
                 </View>
               </View>
-            ))}
-          </View>
+            </AppCard>
+          );
+        })}
+      </View>
 
-          {/* Pro Tips – numbered */}
-          <Text style={styles.sectionTitle}>Pro Tips</Text>
-
-          <View style={styles.tipsCard}>
-            {proTips.map((tip, index) => (
-              <View
-                key={tip}
-                style={[
-                  styles.tipRow,
-                  index === proTips.length - 1 && { marginBottom: 0, borderBottomWidth: 0 },
-                ]}
-              >
-                <View style={styles.tipNumber}>
-                  <Text style={styles.tipNumberText}>{index + 1}</Text>
-                </View>
-                <Text style={styles.tipText}>{tip}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Common Problems */}
-          <Text style={styles.sectionTitle}>Common Problems</Text>
-
-          {commonProblems.map((problem) => (
-            <View key={problem.title} style={styles.problemCard}>
-              <View style={[styles.problemAccent, { backgroundColor: problem.color }]} />
-              <View style={[styles.problemIcon, { backgroundColor: `${problem.color}18` }]}>
-                <MaterialCommunityIcons name={problem.icon} size={22} color={problem.color} />
-              </View>
-              <View style={styles.problemContent}>
-                <Text style={styles.problemTitle}>{problem.title}</Text>
-                <Text style={styles.problemFix}>{problem.fix}</Text>
-              </View>
+      {/* Pro tips */}
+      <SectionTitle title="Pro Tips" />
+      <AppCard padding={6}>
+        {proTips.map((tip, index) => (
+          <View key={tip} style={[styles.tipRow, index === proTips.length - 1 && styles.noBorder]}>
+            <View style={styles.tipNumber}>
+              <Text style={inter(12, "800", palette.cream)}>{index + 1}</Text>
             </View>
-          ))}
+            <Text style={[inter(14, "500", palette.textDark, { lineHeight: 21 }), styles.flex]}>
+              {tip}
+            </Text>
+          </View>
+        ))}
+      </AppCard>
 
-          <View style={{ height: 24 }} />
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+      {/* Common problems */}
+      <SectionTitle title="Common Problems" />
+      {commonProblems.map((problem) => (
+        <AppCard
+          key={problem.title}
+          padding={0}
+          color={problem.color}
+          style={[styles.problem, { borderColor: problem.color }]}
+        >
+          <View style={styles.problemIcon}>
+            <MaterialCommunityIcons name={problem.icon} size={22} color={problem.ink} />
+          </View>
+          <View style={styles.problemText}>
+            <Text style={inter(15, "800", problem.ink)}>{problem.title}</Text>
+            <Text style={[inter(13, "600", problem.ink, { lineHeight: 18, opacity: 0.92 }), styles.mt4]}>
+              {problem.fix}
+            </Text>
+          </View>
+        </AppCard>
+      ))}
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 6,
-  },
-
-  /* Header */
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 18,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
-    backgroundColor: "rgba(46,125,50,0.1)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerCenter: {
-    alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 19,
-    fontWeight: "700",
-    color: "#2E7D32",
-    letterSpacing: 0.3,
-  },
-  headerDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: "#2E7D32",
-    marginTop: 4,
-    opacity: 0.5,
-  },
-  headerRight: {
-    width: 40,
-    height: 40,
-    borderRadius: 14,
-    backgroundColor: "rgba(46,125,50,0.1)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  content: {
-    paddingBottom: 40,
-  },
-
-  /* Hero */
-  heroWrap: {
-    marginBottom: 28,
-  },
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  row: { flexDirection: "row", alignItems: "center" },
+  centerCol: { alignItems: "center" },
+  centerText: { textAlign: "center" },
+  mt4: { marginTop: 4 },
+  ml8: { marginLeft: 8 },
+  mb6: { marginBottom: 6 },
   hero: {
-    borderRadius: 24,
-    padding: 20,
-    overflow: "hidden",
-    position: "relative",
-  },
-  heroContent: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    zIndex: 2,
-  },
-  heroTextBlock: {
-    flex: 1,
-    marginRight: 12,
-  },
-  heroLabel: {
-    fontSize: 10,
-    fontWeight: "700",
-    color: "rgba(255,255,255,0.7)",
-    letterSpacing: 1.2,
-    marginBottom: 6,
-  },
-  heroTitle: {
-    fontSize: 22,
-    fontWeight: "800",
-    color: "#FFF",
-    marginBottom: 4,
-  },
-  heroSubtitle: {
-    fontSize: 13,
-    color: "#E8F5E9",
-  },
-  heroImage: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
+    borderRadius: 28,
+    padding: 18,
+    marginTop: 10,
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.35)",
+    borderColor: creamA(0.75),
+    ...shadow(8, 0.3),
   },
-  heroIconCircle: {
-    width: 68,
-    height: 68,
-    borderRadius: 18,
-    backgroundColor: "rgba(255,255,255,0.18)",
+  heroMascot: {
+    width: 92,
+    height: 92,
+    borderRadius: 22,
+    backgroundColor: creamA(0.16),
     alignItems: "center",
     justifyContent: "center",
-  },
-  heroDecor1: {
-    position: "absolute",
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "rgba(255,255,255,0.08)",
-    top: -40,
-    right: -30,
-  },
-  heroDecor2: {
-    position: "absolute",
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "rgba(255,255,255,0.06)",
-    bottom: -20,
-    left: 30,
-  },
-
-  /* Section */
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#2A2A2A",
-    marginBottom: 12,
+    marginLeft: 12,
   },
   progressPill: {
-    backgroundColor: "#2E7D32",
-    borderRadius: 20,
+    backgroundColor: palette.surface,
+    borderRadius: 999,
     paddingHorizontal: 11,
     paddingVertical: 4,
+  },
+  track: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: creamA(0.35),
+    overflow: "hidden",
     marginBottom: 12,
   },
-  progressPillText: {
-    color: "#FFF",
-    fontWeight: "700",
-    fontSize: 12,
-  },
-
-  /* Progress bar */
-  progressTrack: {
-    height: 6,
-    backgroundColor: "rgba(46,125,50,0.15)",
-    borderRadius: 3,
-    marginBottom: 14,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#2E7D32",
-    borderRadius: 3,
-  },
-
-  /* Challenge */
-  challengeCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 22,
-    padding: 16,
-    marginBottom: 28,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 3,
-  },
+  fill: { height: "100%", borderRadius: 4, backgroundColor: palette.cream },
   taskRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
     borderRadius: 14,
+    marginBottom: 4,
   },
-  taskRowDone: {
-    backgroundColor: "#F8FBF6",
-  },
+  taskRowDone: { backgroundColor: tealA(0.06) },
   checkbox: {
     width: 22,
     height: 22,
     borderRadius: 7,
     borderWidth: 2,
-    borderColor: "#43A047",
+    borderColor: palette.accent,
     alignItems: "center",
     justifyContent: "center",
   },
-  checkboxChecked: {
-    backgroundColor: "#43A047",
-    borderColor: "#43A047",
-  },
-  taskIconWrap: {
+  checkboxOn: { backgroundColor: palette.teal },
+  taskIcon: {
     width: 34,
     height: 34,
     borderRadius: 10,
-    backgroundColor: "rgba(46,125,50,0.1)",
+    backgroundColor: tealA(0.1),
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: 10,
   },
-  taskText: {
-    flex: 1,
-    color: "#333",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  taskTextDone: {
-    color: "#AAA",
-    textDecorationLine: "line-through",
-  },
+  strike: { textDecorationLine: "line-through" },
   doneBanner: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E8F5E9",
+    backgroundColor: palette.greenCardFill,
     borderRadius: 14,
     padding: 12,
-    marginTop: 8,
+    marginTop: 6,
   },
-  doneText: {
-    marginLeft: 8,
-    color: "#2E7D32",
-    fontWeight: "600",
-    fontSize: 13,
-    flex: 1,
-  },
-
-  /* Essentials */
-  essentialsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 28,
-  },
-  essentialCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 18,
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  essentialWide: {
-    width: "48%",
-  },
-  essentialNarrow: {
-    width: "31%",
-    flexDirection: "column",
-    alignItems: "center",
-    paddingVertical: 14,
-  },
-  essentialIcon: {
+  grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between" },
+  essential: { marginBottom: 10 },
+  wide: { width: "48.5%" },
+  narrow: { width: "31.5%" },
+  essIcon: {
     width: 40,
     height: 40,
     borderRadius: 12,
@@ -555,106 +342,39 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 10,
   },
-  essentialLabel: {
-    fontSize: 11,
-    color: "#888",
-    fontWeight: "600",
-    marginBottom: 2,
-  },
-  essentialValue: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#2A2A2A",
-  },
-
-  /* Tips */
-  tipsCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 22,
-    padding: 8,
-    marginBottom: 28,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
   tipRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    borderBottomColor: tealA(0.1),
   },
+  noBorder: { borderBottomWidth: 0 },
   tipNumber: {
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: "rgba(46,125,50,0.12)",
+    backgroundColor: palette.teal,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
-    marginTop: 1,
   },
-  tipNumberText: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#2E7D32",
-  },
-  tipText: {
-    flex: 1,
-    color: "#555",
-    fontSize: 14,
-    lineHeight: 21,
-  },
-
-  /* Problems */
-  problemCard: {
-    backgroundColor: "#FFF",
-    borderRadius: 18,
+  problem: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  problemAccent: {
-    width: 5,
-    height: "100%",
-    position: "absolute",
-    left: 0,
-    top: 0,
-    bottom: 0,
   },
   problemIcon: {
     width: 44,
     height: 44,
     borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.25)",
     alignItems: "center",
     justifyContent: "center",
     marginLeft: 16,
     marginVertical: 14,
   },
-  problemContent: {
-    flex: 1,
-    marginLeft: 12,
-    marginRight: 14,
-    paddingVertical: 14,
-  },
-  problemTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#2A2A2A",
-    marginBottom: 3,
-  },
-  problemFix: {
-    fontSize: 13,
-    color: "#777",
-    lineHeight: 18,
-  },
-});
+  problemText: { flex: 1, marginLeft: 12, marginRight: 14, paddingVertical: 14 },
+}));

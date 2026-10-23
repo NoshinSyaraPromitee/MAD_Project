@@ -3,104 +3,62 @@
 // ===============================
 
 import React from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import AppScreen from "../components/AppScreen";
+import AppButton from "../components/AppButton";
+import { palette, creamA } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { themed } from "../theme/themed";
 
 export default function ScanPlantScreen({ navigation }) {
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.content}>
-
-        {/* Back Button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={28}
-            color="#2E7D32"
-          />
-        </TouchableOpacity>
-
-        <Text style={styles.title}>
-          Scan Your Plant
-        </Text>
-
-        <View style={styles.circle}>
-          <MaterialCommunityIcons
-            name="camera"
-            size={90}
-            color="#2E7D32"
-          />
+    <AppScreen title="Scan Your Plant" showBack={false} edges={["top"]}>
+      <View style={styles.center}>
+        <View style={styles.ringOuter}>
+          <View style={styles.circle}>
+            <MaterialCommunityIcons name="camera" size={84} color={palette.accent} />
+          </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() =>
-            navigation.navigate("ScanResult")
-          }
-        >
-          <Text style={styles.buttonText}>
-            Open Camera
-          </Text>
-        </TouchableOpacity>
+        <Text style={[inter(15, "700", palette.cream), styles.hint]}>
+          Snap a clear photo of a leaf or the whole plant and let the AI do the rest.
+        </Text>
 
-      </SafeAreaView>
-    </LinearGradient>
+        <AppButton
+          label="Open Camera"
+          rightIcon="camera"
+          onPress={() => navigation.navigate("ScanResult")}
+          style={styles.button}
+        />
+      </View>
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
+const styles = themed(() => ({
+  center: { flex: 1, alignItems: "center", justifyContent: "center", paddingBottom: 24 },
+  ringOuter: {
+    width: 236,
+    height: 236,
+    borderRadius: 118,
+    borderWidth: 2,
+    borderColor: creamA(0.6),
+    borderStyle: "dashed",
     alignItems: "center",
-  },
-  backButton: {
-    position: "absolute",
-    top: 15,
-    left: 20,
-    padding: 4,
-    zIndex: 10,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 40,
-    color: "#2E7D32",
+    justifyContent: "center",
   },
   circle: {
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: "#fff",
-    justifyContent: "center",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: palette.surface,
     alignItems: "center",
+    justifyContent: "center",
+    ...shadow(8, 0.3),
   },
-  button: {
-    marginTop: 40,
-    backgroundColor: "#2E7D32",
-    padding: 18,
-    paddingHorizontal: 50,
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-});
+  hint: { textAlign: "center", marginTop: 28, paddingHorizontal: 12, lineHeight: 21 },
+  button: { marginTop: 28, alignSelf: "stretch" },
+}));

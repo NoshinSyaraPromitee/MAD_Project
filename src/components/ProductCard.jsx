@@ -1,229 +1,141 @@
 import React, { useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-
+import { Image, Pressable, Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import AppCard from "./AppCard";
+import QuantityStepper from "./QuantityStepper";
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
+import { palette } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { taka } from "../utils/format";
+import { themed } from "../theme/themed";
 
-export default function ProductCard({
-  product,
-  navigation,
-}) {
-  const { addToCart } = useContext(CartContext);
+export default function ProductCard({ product, navigation }) {
+  const { cartItems, addToCart, increaseQuantity, decreaseQuantity, removeFromCart } =
+    useContext(CartContext);
   const { isInWishlist, toggleWishlist } = useContext(WishlistContext);
 
   const wishlisted = isInWishlist(product.id);
+  const qty = cartItems.find((i) => i.id === product.id)?.quantity || 0;
+
+  const minus = () => (qty <= 1 ? removeFromCart(product.id) : decreaseQuantity(product.id));
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.9}
+    <AppCard
+      padding={0}
       style={styles.card}
-      onPress={() =>
-        navigation.navigate("ProductDetails", {
-          product,
-        })
-      }
+      onPress={() => navigation.navigate("ProductDetails", { product })}
     >
-      {/* Product Image */}
+      <View>
+        <Image source={{ uri: product.image }} style={styles.image} />
 
-      <Image
-        source={{ uri: product.image }}
-        style={styles.image}
-      />
+        <View style={styles.rating}>
+          <MaterialCommunityIcons name="star" color={palette.star} size={14} />
+          <Text style={[inter(12, "700", palette.textDark), styles.ratingText]}>
+            {product.rating}
+          </Text>
+        </View>
 
-      {/* Rating */}
-
-      <View style={styles.rating}>
-        <MaterialCommunityIcons
-          name="star"
-          color="#FFD54F"
-          size={15}
-        />
-
-        <Text style={styles.ratingText}>
-          {product.rating}
-        </Text>
-      </View>
-
-      {/* Wishlist */}
-
-      <TouchableOpacity
-        style={styles.favorite}
-        onPress={() => toggleWishlist(product)}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-      >
-        <MaterialCommunityIcons
-          name={wishlisted ? "heart" : "heart-outline"}
-          color={wishlisted ? "#E53935" : "#2E7D32"}
-          size={22}
-        />
-      </TouchableOpacity>
-
-      {/* Product Name */}
-
-      <Text numberOfLines={2} style={styles.name}>
-        {product.name}
-      </Text>
-
-      {/* Category + Unit (measurement) */}
-
-      <View style={styles.metaRow}>
-        <Text style={styles.category}>
-          {product.category}
-        </Text>
-
-        {product.unit && (
-          <View style={styles.unitPill}>
-            <Text style={styles.unitText}>
-              {product.unit}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {/* Bottom */}
-
-      <View style={styles.bottomRow}>
-        <Text style={styles.price}>
-        ৳{product.price.toFixed(2)}
-        </Text>
-
-        <TouchableOpacity
-          style={styles.cartButton}
-          onPress={() => addToCart(product)}
-        >
+        <Pressable style={styles.favorite} onPress={() => toggleWishlist(product)} hitSlop={8}>
           <MaterialCommunityIcons
-            name="cart-plus"
+            name={wishlisted ? "heart" : "heart-outline"}
+            color={wishlisted ? palette.danger : palette.accent}
             size={20}
-            color="white"
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
-    </TouchableOpacity>
+
+      <View style={styles.body}>
+        <Text numberOfLines={2} style={[inter(14, "700", palette.textDark), styles.name]}>
+          {product.name}
+        </Text>
+
+        <View style={styles.metaRow}>
+          <Text style={inter(11, "500", palette.textMuted)} numberOfLines={1}>
+            {product.category}
+          </Text>
+          {product.unit ? (
+            <View style={styles.unitPill}>
+              <Text style={inter(10, "700", palette.accent)}>{product.unit}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        <Text style={inter(16, "800", palette.price)}>{taka(product.price)}</Text>
+
+        <View style={styles.action}>
+          {qty === 0 ? (
+            <Pressable
+              onPress={() => addToCart(product)}
+              style={({ pressed }) => [styles.addBtn, pressed && { opacity: 0.85 }]}
+            >
+              <MaterialCommunityIcons name="cart-plus" size={16} color={palette.cream} />
+              <Text style={[inter(12, "700", palette.cream), styles.addText]}>Add to Cart</Text>
+            </Pressable>
+          ) : (
+            <QuantityStepper
+              value={qty}
+              onMinus={minus}
+              onPlus={() => increaseQuantity(product.id)}
+            />
+          )}
+        </View>
+      </View>
+    </AppCard>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    width: 170,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 22,
-    marginBottom: 18,
-    padding: 12,
-
-    shadowColor: "#000",
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-
-    elevation: 6,
-  },
-
+const styles = themed(() => ({
+  card: { width: "48.5%", marginBottom: 12, overflow: "hidden" },
   image: {
     width: "100%",
-    height: 150,
-    borderRadius: 18,
+    height: 130,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    backgroundColor: "rgba(27,90,75,0.08)",
   },
-
   rating: {
     position: "absolute",
-    top: 18,
-    left: 18,
-
-    backgroundColor: "white",
+    top: 8,
+    left: 8,
     flexDirection: "row",
     alignItems: "center",
-
+    backgroundColor: palette.surface,
+    borderRadius: 999,
     paddingHorizontal: 8,
-    paddingVertical: 4,
-
-    borderRadius: 20,
+    paddingVertical: 3,
   },
-
-  ratingText: {
-    marginLeft: 4,
-    fontWeight: "600",
-  },
-
+  ratingText: { marginLeft: 3 },
   favorite: {
     position: "absolute",
-    top: 18,
-    right: 18,
-
-    width: 34,
-    height: 34,
-
-    backgroundColor: "white",
-
+    top: 8,
+    right: 8,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: palette.surface,
+    alignItems: "center",
     justifyContent: "center",
-    alignItems: "center",
-
-    borderRadius: 17,
   },
-
-  name: {
-    marginTop: 12,
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#2E7D32",
-  },
-
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    flexWrap: "wrap",
-    marginTop: 4,
-    marginBottom: 10,
-  },
-
-  category: {
-    color: "#777",
-    fontSize: 13,
-    marginRight: 6,
-  },
-
+  body: { paddingHorizontal: 10, paddingTop: 8, paddingBottom: 10 },
+  name: { minHeight: 36 },
+  metaRow: { flexDirection: "row", alignItems: "center", marginVertical: 4, flexWrap: "wrap" },
   unitPill: {
-    backgroundColor: "#E8F5E9",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    backgroundColor: palette.greenCardFill,
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    marginLeft: 6,
   },
-
-  unitText: {
-    color: "#2E7D32",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-
-  bottomRow: {
+  action: { marginTop: 8, minHeight: 36, justifyContent: "center" },
+  addBtn: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-  },
-
-  price: {
-    fontSize: 19,
-    fontWeight: "bold",
-    color: "#FF9800",
-  },
-
-  cartButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-
-    backgroundColor: "#2E7D32",
-
     justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: palette.teal,
+    borderRadius: 10,
+    paddingVertical: 8,
   },
-});
+  addText: { marginLeft: 6 },
+}));

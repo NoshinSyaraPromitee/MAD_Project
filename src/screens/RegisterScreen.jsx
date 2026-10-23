@@ -4,161 +4,110 @@
 
 import React, { useState } from "react";
 import {
-  SafeAreaView,
-  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
   Text,
-  TextInput,
-  TouchableOpacity,
   View,
-  Image,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import GradientBackground from "../components/GradientBackground";
+import BackButton from "../components/BackButton";
+import MascotCard from "../components/MascotCard";
+import AppTextField from "../components/AppTextField";
+import AppButton from "../components/AppButton";
+import { palette, creamA } from "../theme/colors";
+import { fredoka, inter } from "../theme/typography";
+import { themed } from "../theme/themed";
 
 export default function RegisterScreen({ navigation }) {
   const [hide, setHide] = useState(true);
 
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.content}>
-        {/* Back button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+    <GradientBackground>
+      <SafeAreaView style={styles.flex}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={28}
-            color="#2E7D32"
-          />
-        </TouchableOpacity>
+          <View style={styles.topBar}>
+            <BackButton />
+          </View>
 
-        <Image
-          source={require("../../assets/images/login.gif")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+          <ScrollView
+            contentContainerStyle={styles.content}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.header}>
+              <MascotCard size={130} glow={false} leaves={false} />
+              <Text style={[fredoka(34, "700", palette.cream), styles.title]}>Create Account</Text>
+              <Text style={inter(15, "600", creamA(0.92))}>Join the green family</Text>
+            </View>
 
-        <Text style={styles.title}>Create Account</Text>
+            <AppTextField icon="account-outline" placeholder="Full Name" />
 
-        <View style={styles.input}>
-          <MaterialCommunityIcons
-            name="account-outline"
-            size={22}
-            color="#2E7D32"
-          />
-          <TextInput placeholder="Full Name" style={styles.textInput} />
-        </View>
-
-        <View style={styles.input}>
-          <MaterialCommunityIcons
-            name="email-outline"
-            size={22}
-            color="#2E7D32"
-          />
-          <TextInput
-            placeholder="Email"
-            style={styles.textInput}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
-        <View style={styles.input}>
-          <MaterialCommunityIcons
-            name="lock-outline"
-            size={22}
-            color="#2E7D32"
-          />
-
-          <TextInput
-            placeholder="Password"
-            secureTextEntry={hide}
-            style={styles.textInput}
-          />
-
-          <TouchableOpacity onPress={() => setHide(!hide)}>
-            <MaterialCommunityIcons
-              name={hide ? "eye-off" : "eye"}
-              size={22}
-              color="#777"
+            <AppTextField
+              icon="email-outline"
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
-          </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.replace("MainTabs")}
-        >
-          <Text style={styles.buttonText}>Create Account</Text>
-        </TouchableOpacity>
+            <AppTextField
+              icon="lock-outline"
+              placeholder="Password"
+              secureTextEntry={hide}
+              right={
+                <Pressable onPress={() => setHide(!hide)} hitSlop={10}>
+                  <MaterialCommunityIcons
+                    name={hide ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color={palette.textMuted}
+                  />
+                </Pressable>
+              }
+            />
+
+            <AppButton
+              label="Create Account"
+              onPress={() => navigation.replace("MainTabs")}
+              style={styles.button}
+            />
+
+            <View style={styles.footer}>
+              <Text style={inter(14, "600", palette.cream)}>Already have an account?</Text>
+              <Pressable onPress={() => navigation.navigate("Login")} hitSlop={8}>
+                <Text style={[inter(14, "800", palette.cream), styles.link]}>Login</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
-    </LinearGradient>
+    </GradientBackground>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 25,
-  },
-
-  backButton: {
-    position: "absolute",
-    top: 10,
-    left: 25,
-    zIndex: 10,
-    padding: 5,
-  },
-
-  logo: {
-    width: 140,
-    height: 140,
-    alignSelf: "center",
-  },
-
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  topBar: { paddingHorizontal: 16, paddingTop: 8 },
+  content: { flexGrow: 1, justifyContent: "center", paddingHorizontal: 24, paddingBottom: 32 },
+  header: { alignItems: "center", marginBottom: 26 },
   title: {
-    fontSize: 30,
-    fontWeight: "bold",
-    color: "#2E7D32",
-    marginVertical: 25,
-    textAlign: "center",
+    marginTop: 6,
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 8,
   },
-
-  input: {
-    backgroundColor: "#fff",
+  button: { marginTop: 8 },
+  footer: {
     flexDirection: "row",
+    justifyContent: "center",
     alignItems: "center",
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    height: 58,
+    marginTop: 28,
   },
-
-  textInput: {
-    flex: 1,
-    marginLeft: 10,
-  },
-
-  button: {
-    backgroundColor: "#2E7D32",
-    borderRadius: 15,
-    padding: 18,
-    alignItems: "center",
-    marginTop: 15,
-  },
-
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-});
+  link: { marginLeft: 6, textDecorationLine: "underline" },
+}));

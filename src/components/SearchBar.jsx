@@ -1,48 +1,28 @@
 import React from "react";
-import { View, TextInput, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export default function SearchBar() {
-  return (
-    <View style={styles.container}>
-      <MaterialCommunityIcons
-        name="magnify"
-        size={22}
-        color="#777"
-      />
+import AppTextField from "./AppTextField";
+import { palette } from "../theme/colors";
 
-      <TextInput
-        placeholder="Search plants..."
-        style={styles.input}
-      />
-    </View>
+/** Cream search field with a clear button. */
+export default function SearchBar({ value, onChangeText, placeholder = "Search plants...", style }) {
+  return (
+    <AppTextField
+      icon="magnify"
+      radius={18}
+      placeholder={placeholder}
+      value={value}
+      onChangeText={onChangeText}
+      autoCorrect={false}
+      style={style}
+      right={
+        value ? (
+          <Pressable onPress={() => onChangeText?.("")} hitSlop={10}>
+            <MaterialCommunityIcons name="close-circle" size={20} color={palette.textMuted} />
+          </Pressable>
+        ) : null
+      }
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#fff",
-
-    flexDirection: "row",
-
-    alignItems: "center",
-
-    paddingHorizontal: 15,
-
-    borderRadius: 15,
-
-    height: 55,
-
-    elevation: 3,
-
-    marginBottom: 25,
-  },
-
-  input: {
-    flex: 1,
-
-    marginLeft: 10,
-
-    fontSize: 16,
-  },
-});

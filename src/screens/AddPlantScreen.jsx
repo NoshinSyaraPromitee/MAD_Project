@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Alert,
-} from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { Alert, Pressable, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import AppScreen from "../components/AppScreen";
+import AppTextField from "../components/AppTextField";
+import AppButton from "../components/AppButton";
+import { palette } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { themed } from "../theme/themed";
 
 export default function AddPlantScreen({ navigation }) {
   const [nickname, setNickname] = useState("");
@@ -30,250 +26,68 @@ export default function AddPlantScreen({ navigation }) {
     }
 
     // Later this will save to Context or Firebase
-
-    Alert.alert(
-      "Plant Added 🌱",
-      `${nickname} has been added to your collection!`,
-      [
-        {
-          text: "OK",
-          onPress: () => navigation.goBack(),
-        },
-      ]
-    );
+    Alert.alert("Plant Added \uD83C\uDF31", `${nickname} has been added to your collection!`, [
+      { text: "OK", onPress: () => navigation.goBack() },
+    ]);
   };
 
+  const label = (text) => <Text style={[inter(15, "700", palette.cream), styles.label]}>{text}</Text>;
+
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={styles.container}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
+    <AppScreen title="Add Plant" scroll>
+      <Pressable style={({ pressed }) => [styles.photoCard, pressed && { opacity: 0.9 }]}>
+        <MaterialCommunityIcons name="camera-plus-outline" size={56} color={palette.accent} />
+        <Text style={[inter(16, "700", palette.accent), styles.photoText]}>Add Plant Photo</Text>
+      </Pressable>
 
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-            >
-              <MaterialCommunityIcons
-                name="arrow-left"
-                size={28}
-                color="#2E7D32"
-              />
-            </TouchableOpacity>
+      {label("Nickname")}
+      <AppTextField icon="tag-heart-outline" placeholder="Bella" value={nickname} onChangeText={setNickname} />
 
-            <Text style={styles.title}>
-              Add Plant
-            </Text>
+      {label("Plant Species")}
+      <AppTextField icon="leaf" placeholder="Monstera Deliciosa" value={species} onChangeText={setSpecies} />
 
-            <View style={{ width: 28 }} />
-          </View>
+      {label("Location")}
+      <AppTextField icon="map-marker-outline" placeholder="Living Room" value={location} onChangeText={setLocation} />
 
-          {/* Photo Placeholder */}
+      {label("Sunlight")}
+      <AppTextField icon="white-balance-sunny" placeholder="Medium" value={sunlight} onChangeText={setSunlight} />
 
-          <TouchableOpacity style={styles.photoCard}>
-            <MaterialCommunityIcons
-              name="camera-plus"
-              size={60}
-              color="#2E7D32"
-            />
+      {label("Watering Schedule")}
+      <AppTextField icon="water-outline" placeholder="Every 3 Days" value={watering} onChangeText={setWatering} />
 
-            <Text style={styles.photoText}>
-              Add Plant Photo
-            </Text>
-          </TouchableOpacity>
+      <AppButton
+        label="Auto Fill Using AI Scan"
+        leftIcon="robot-outline"
+        variant="outline"
+        onPress={() => navigation.navigate("MainTabs", { screen: "Scan" })}
+        style={styles.aiButton}
+      />
 
-          {/* Nickname */}
-
-          <Text style={styles.label}>Nickname</Text>
-
-          <TextInput
-            placeholder="Bella"
-            style={styles.input}
-            value={nickname}
-            onChangeText={setNickname}
-          />
-
-          {/* Species */}
-
-          <Text style={styles.label}>
-            Plant Species
-          </Text>
-
-          <TextInput
-            placeholder="Monstera Deliciosa"
-            style={styles.input}
-            value={species}
-            onChangeText={setSpecies}
-          />
-
-          {/* Location */}
-
-          <Text style={styles.label}>
-            Location
-          </Text>
-
-          <TextInput
-            placeholder="Living Room"
-            style={styles.input}
-            value={location}
-            onChangeText={setLocation}
-          />
-
-          {/* Sunlight */}
-
-          <Text style={styles.label}>
-            Sunlight
-          </Text>
-
-          <TextInput
-            placeholder="Medium"
-            style={styles.input}
-            value={sunlight}
-            onChangeText={setSunlight}
-          />
-
-          {/* Watering */}
-
-          <Text style={styles.label}>
-            Watering Schedule
-          </Text>
-
-          <TextInput
-            placeholder="Every 3 Days"
-            style={styles.input}
-            value={watering}
-            onChangeText={setWatering}
-          />
-
-          {/* AI Button */}
-
-          <TouchableOpacity
-            style={styles.aiButton}
-            onPress={() =>
-              navigation.navigate("ScanPlant")
-            }
-          >
-            <MaterialCommunityIcons
-              name="robot"
-              size={22}
-              color="#2E7D32"
-            />
-
-            <Text style={styles.aiText}>
-              Auto Fill Using AI Scan
-            </Text>
-          </TouchableOpacity>
-
-          {/* Save */}
-
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={handleSave}
-          >
-            <MaterialCommunityIcons
-              name="content-save"
-              size={22}
-              color="white"
-            />
-
-            <Text style={styles.saveText}>
-              Save Plant
-            </Text>
-          </TouchableOpacity>
-
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+      <AppButton
+        label="Save Plant"
+        leftIcon="content-save-outline"
+        onPress={handleSave}
+        style={styles.saveButton}
+      />
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  container:{
-    padding:20,
-    paddingBottom:40,
+const styles = themed(() => ({
+  photoCard: {
+    height: 190,
+    marginTop: 10,
+    marginBottom: 20,
+    borderRadius: 24,
+    backgroundColor: palette.surface,
+    borderWidth: 2,
+    borderStyle: "dashed",
+    borderColor: palette.accent,
+    alignItems: "center",
+    justifyContent: "center",
   },
-
-  header:{
-    flexDirection:"row",
-    justifyContent:"space-between",
-    alignItems:"center",
-    marginBottom:25,
-  },
-
-  title:{
-    fontSize:28,
-    fontWeight:"bold",
-    color:"#2E7D32",
-  },
-
-  photoCard:{
-    height:200,
-    backgroundColor:"white",
-    borderRadius:25,
-    justifyContent:"center",
-    alignItems:"center",
-    marginBottom:25,
-  },
-
-  photoText:{
-    marginTop:15,
-    fontWeight:"bold",
-    color:"#2E7D32",
-    fontSize:17,
-  },
-
-  label:{
-    marginBottom:8,
-    fontWeight:"bold",
-    color:"#2E7D32",
-    fontSize:16,
-  },
-
-  input:{
-    backgroundColor:"white",
-    borderRadius:15,
-    padding:15,
-    marginBottom:18,
-    fontSize:16,
-  },
-
-  aiButton:{
-    flexDirection:"row",
-    justifyContent:"center",
-    alignItems:"center",
-    borderWidth:2,
-    borderColor:"#2E7D32",
-    borderRadius:18,
-    padding:16,
-    marginTop:10,
-  },
-
-  aiText:{
-    marginLeft:10,
-    color:"#2E7D32",
-    fontWeight:"bold",
-    fontSize:16,
-  },
-
-  saveButton:{
-    marginTop:20,
-    backgroundColor:"#2E7D32",
-    borderRadius:18,
-    padding:18,
-    flexDirection:"row",
-    justifyContent:"center",
-    alignItems:"center",
-  },
-
-  saveText:{
-    marginLeft:10,
-    color:"white",
-    fontWeight:"bold",
-    fontSize:18,
-  },
-});
+  photoText: { marginTop: 12 },
+  label: { marginBottom: 8, marginLeft: 4 },
+  aiButton: { marginTop: 8 },
+  saveButton: { marginTop: 14 },
+}));

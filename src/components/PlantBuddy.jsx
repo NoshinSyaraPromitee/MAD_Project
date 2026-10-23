@@ -1,57 +1,42 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { Text, View } from "react-native";
 
-// Animated mascot — uses the pot-character GIF.
-export default function PlantBuddy({ message }) {
+import RiveMascot from "./RiveMascot";
+import { palette } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { themed } from "../theme/themed";
+
+// Animated mascot (totoro.riv) with an optional speech bubble.
+export default function PlantBuddy({ message, size = 160 }) {
   return (
     <View style={styles.wrapper}>
       {message ? (
         <View style={styles.bubble}>
-          <Text style={styles.bubbleText}>{message}</Text>
-          <View style={styles.bubbleTail} />
+          <Text style={[inter(14, "700", palette.textDark), styles.center]}>{message}</Text>
+          <View style={styles.tail} />
         </View>
       ) : null}
-
-      <Image
-        source={require("../../assets/images/pot-character.gif")}
-        style={styles.character}
-        resizeMode="contain"
-      />
+      <RiveMascot width={size} />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    alignItems: "center",
-    marginBottom: 10,
-  },
-
-  character: {
-    width: 160,
-    height: 160,
-  },
-
+const styles = themed(() => ({
+  wrapper: { alignItems: "center", marginBottom: 10 },
+  center: { textAlign: "center" },
   bubble: {
-    backgroundColor: "white",
+    backgroundColor: palette.surface,
     borderRadius: 18,
     paddingVertical: 12,
     paddingHorizontal: 18,
     maxWidth: 260,
-    marginBottom: 6,
-    elevation: 4,
+    marginBottom: 10,
+    ...shadow(4),
   },
-
-  bubbleText: {
-    color: "#333",
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-
-  bubbleTail: {
+  tail: {
     position: "absolute",
-    bottom: -8,
+    bottom: -9,
     left: "50%",
     marginLeft: -8,
     width: 0,
@@ -61,6 +46,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 10,
     borderLeftColor: "transparent",
     borderRightColor: "transparent",
-    borderTopColor: "white",
+    borderTopColor: palette.surface,
   },
-});
+}));

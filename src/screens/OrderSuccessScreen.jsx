@@ -1,231 +1,101 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useMemo } from "react";
+import { ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import GradientBackground from "../components/GradientBackground";
+import AppCard from "../components/AppCard";
+import AppButton from "../components/AppButton";
+import { palette, creamA, tealA } from "../theme/colors";
+import { fredoka, inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { themed } from "../theme/themed";
+
 export default function OrderSuccessScreen({ navigation }) {
-  const orderId =
-    "#" + Math.floor(Math.random() * 900000 + 100000);
+  const orderId = useMemo(() => "#" + Math.floor(Math.random() * 900000 + 100000), []);
+
+  const goHome = () =>
+    navigation.reset({ index: 0, routes: [{ name: "MainTabs" }] });
+
+  const goShop = () =>
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "MainTabs", params: { screen: "Shop" } }],
+    });
+
+  const rows = [
+    ["Order ID", orderId, palette.textDark],
+    ["Estimated Delivery", "3-5 Days", palette.textDark],
+    ["Status", "Processing", palette.accent],
+  ];
 
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={styles.container}>
-
-        <View style={styles.circle}>
-          <MaterialCommunityIcons
-            name="check-bold"
-            size={90}
-            color="white"
-          />
-        </View>
-
-        <Text style={styles.title}>
-          Order Confirmed!
-        </Text>
-
-        <Text style={styles.subtitle}>
-          Thank you for shopping with MyPlantPal.
-        </Text>
-
-        <Text style={styles.subtitle}>
-          Your order has been placed successfully.
-        </Text>
-
-        <View style={styles.card}>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>
-              Order ID
-            </Text>
-
-            <Text style={styles.value}>
-              {orderId}
-            </Text>
+    <GradientBackground>
+      <SafeAreaView style={styles.flex}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <View style={styles.circle}>
+            <MaterialCommunityIcons name="check-bold" size={84} color={palette.cream} />
           </View>
 
-          <View style={styles.divider} />
-
-          <View style={styles.row}>
-            <Text style={styles.label}>
-              Estimated Delivery
-            </Text>
-
-            <Text style={styles.value}>
-              3-5 Days
-            </Text>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.row}>
-            <Text style={styles.label}>
-              Status
-            </Text>
-
-            <Text
-              style={[
-                styles.value,
-                { color: "#2E7D32" },
-              ]}
-            >
-              Processing
-            </Text>
-          </View>
-
-        </View>
-
-        <TouchableOpacity
-          style={styles.homeButton}
-          onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "MainTabs" }],
-            })
-          }
-        >
-          <MaterialCommunityIcons
-            name="MainTabs"
-            size={22}
-            color="white"
-          />
-
-          <Text style={styles.buttonText}>
-            Back to Home
+          <Text style={[fredoka(36, "700", palette.cream), styles.title]}>Order Confirmed!</Text>
+          <Text style={[inter(15, "600", creamA(0.92)), styles.sub]}>
+            Thank you for shopping with MyPlantPal.
           </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.shopButton}
-          onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "MainTabs" }],
-            })
-          }
-        >
-          <MaterialCommunityIcons
-            name="shopping"
-            size={22}
-            color="#2E7D32"
-          />
-
-          <Text style={styles.shopText}>
-            Continue Shopping
+          <Text style={[inter(15, "600", creamA(0.92)), styles.sub]}>
+            Your order has been placed successfully.
           </Text>
-        </TouchableOpacity>
 
+          <AppCard style={styles.card} padding={22}>
+            {rows.map(([label, value, color], i) => (
+              <View key={label}>
+                {i > 0 ? <View style={styles.divider} /> : null}
+                <View style={styles.row}>
+                  <Text style={inter(15, "500", palette.textMuted)}>{label}</Text>
+                  <Text style={inter(15, "800", color)}>{value}</Text>
+                </View>
+              </View>
+            ))}
+          </AppCard>
+
+          <AppButton label="Back to Home" leftIcon="home" onPress={goHome} style={styles.btn} />
+          <AppButton
+            label="Continue Shopping"
+            leftIcon="shopping"
+            variant="outline"
+            onPress={goShop}
+            style={styles.btn2}
+          />
+        </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </GradientBackground>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 25,
-  },
-
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  content: { flexGrow: 1, alignItems: "center", justifyContent: "center", padding: 24 },
   circle: {
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: "#2E7D32",
-    justifyContent: "center",
+    backgroundColor: palette.teal,
+    borderWidth: 4,
+    borderColor: palette.cream,
     alignItems: "center",
-    elevation: 8,
+    justifyContent: "center",
+    ...shadow(10, 0.3),
   },
-
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    marginTop: 35,
-    color: "#2E7D32",
-  },
-
-  subtitle: {
-    color: "#666",
-    fontSize: 16,
+    marginTop: 28,
     textAlign: "center",
-    marginTop: 8,
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 8,
   },
-
-  card: {
-    width: "100%",
-    backgroundColor: "white",
-    borderRadius: 25,
-    padding: 25,
-    marginTop: 35,
-    elevation: 5,
-  },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-
-  divider: {
-    height: 1,
-    backgroundColor: "#E5E5E5",
-    marginVertical: 18,
-  },
-
-  label: {
-    color: "#666",
-    fontSize: 16,
-  },
-
-  value: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-
-  homeButton: {
-    width: "100%",
-    backgroundColor: "#2E7D32",
-    borderRadius: 18,
-    padding: 18,
-    marginTop: 35,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-
-  shopButton: {
-    width: "100%",
-    backgroundColor: "white",
-    borderRadius: 18,
-    padding: 18,
-    marginTop: 15,
-    borderWidth: 2,
-    borderColor: "#2E7D32",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  shopText: {
-    color: "#2E7D32",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-});
+  sub: { textAlign: "center", marginTop: 6 },
+  card: { alignSelf: "stretch", marginTop: 30 },
+  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  divider: { height: 1, backgroundColor: tealA(0.12), marginVertical: 14 },
+  btn: { alignSelf: "stretch", marginTop: 30 },
+  btn2: { alignSelf: "stretch", marginTop: 12 },
+}));

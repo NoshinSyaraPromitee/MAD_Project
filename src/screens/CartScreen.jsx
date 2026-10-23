@@ -1,383 +1,145 @@
 import React, { useContext } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  Image,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { FlatList, Image, Pressable, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import AppScreen from "../components/AppScreen";
+import AppCard from "../components/AppCard";
+import AppButton from "../components/AppButton";
+import EmptyView from "../components/EmptyView";
+import QuantityStepper from "../components/QuantityStepper";
 import { CartContext } from "../context/CartContext";
+import { palette, tealA } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { taka } from "../utils/format";
+import { themed } from "../theme/themed";
 
 export default function CartScreen({ navigation }) {
-  const {
-    cartItems,
-    increaseQuantity,
-    decreaseQuantity,
-    removeFromCart,
-    totalPrice,
-  } = useContext(CartContext);
+  const { cartItems, increaseQuantity, decreaseQuantity, removeFromCart, totalPrice } =
+    useContext(CartContext);
 
   const shipping = cartItems.length > 0 ? 5.99 : 0;
   const tax = totalPrice * 0.05;
   const grandTotal = totalPrice + shipping + tax;
 
-  const goToShop = () => {
-    navigation.navigate("MainTabs", { screen: "Shop" });
-  };
+  const goToShop = () => navigation.navigate("MainTabs", { screen: "Shop" });
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Image
-        source={{ uri: item.image }}
-        style={styles.image}
-      />
+    <AppCard style={styles.card} padding={12}>
+      <View style={styles.row}>
+        <Image source={{ uri: item.image }} style={styles.image} />
 
-      <View style={styles.info}>
-        <Text style={styles.name}>
-          {item.name}
-        </Text>
-
-        <Text style={styles.category}>
-          {item.category}
-        </Text>
-
-        {item.unit && (
-          <View style={styles.unitPill}>
-            <Text style={styles.unitText}>
-              {item.unit}
-            </Text>
-          </View>
-        )}
-
-        <Text style={styles.price}>
-          ৳{item.price.toFixed(2)}
-        </Text>
-
-        <View style={styles.quantityRow}>
-          <TouchableOpacity
-            style={styles.qtyButton}
-            onPress={() =>
-              decreaseQuantity(item.id)
-            }
-          >
-            <MaterialCommunityIcons
-              name="minus"
-              size={18}
-              color="#2E7D32"
-            />
-          </TouchableOpacity>
-
-          <Text style={styles.quantity}>
-            {item.quantity}
+        <View style={styles.info}>
+          <Text style={inter(15, "700", palette.textDark)} numberOfLines={2}>
+            {item.name}
           </Text>
-
-          <TouchableOpacity
-            style={styles.qtyButton}
-            onPress={() =>
-              increaseQuantity(item.id)
-            }
-          >
-            <MaterialCommunityIcons
-              name="plus"
-              size={18}
-              color="#2E7D32"
+          <View style={styles.metaRow}>
+            <Text style={inter(12, "500", palette.textMuted)}>{item.category}</Text>
+            {item.unit ? (
+              <View style={styles.unitPill}>
+                <Text style={inter(10, "700", palette.accent)}>{item.unit}</Text>
+              </View>
+            ) : null}
+          </View>
+          <Text style={inter(16, "800", palette.price)}>{taka(item.price)}</Text>
+          <View style={styles.stepper}>
+            <QuantityStepper
+              value={item.quantity}
+              onMinus={() => decreaseQuantity(item.id)}
+              onPlus={() => increaseQuantity(item.id)}
             />
-          </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      <TouchableOpacity
-        onPress={() =>
-          removeFromCart(item.id)
-        }
-      >
-        <MaterialCommunityIcons
-          name="delete-outline"
-          size={28}
-          color="#E53935"
-        />
-      </TouchableOpacity>
+        <Pressable onPress={() => removeFromCart(item.id)} hitSlop={8} style={styles.remove}>
+          <MaterialCommunityIcons name="delete-outline" size={22} color={palette.danger} />
+        </Pressable>
+      </View>
+    </AppCard>
+  );
+
+  const line = (label, value, bold) => (
+    <View style={styles.sumRow}>
+      <Text style={inter(bold ? 18 : 14, bold ? "800" : "500", palette.textDark)}>{label}</Text>
+      <Text style={inter(bold ? 18 : 14, bold ? "800" : "600", palette.textDark)}>{taka(value)}</Text>
     </View>
   );
 
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
-        {/* Header */}
+    <AppScreen title="My Cart" padded={false} edges={["top", "left", "right"]}>
+      {cartItems.length === 0 ? (
+        <EmptyView
+          icon="cart-outline"
+          title="Your cart is empty"
+          subtitle="Find something green for your garden."
+          actionLabel="Continue Shopping"
+          onAction={goToShop}
+        />
+      ) : (
+        <>
+          <FlatList
+            data={cartItems}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.list}
+            showsVerticalScrollIndicator={false}
+          />
 
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={28}
-              color="#2E7D32"
+          <SafeAreaView edges={["bottom"]} style={styles.summary}>
+            {line("Subtotal", totalPrice)}
+            {line("Shipping", shipping)}
+            {line("Tax (5%)", tax)}
+            <View style={styles.divider} />
+            {line("Total", grandTotal, true)}
+            <AppButton
+              label="Proceed to Checkout"
+              rightIcon="arrow-right"
+              onPress={() => navigation.navigate("Checkout")}
+              style={styles.checkout}
             />
-          </TouchableOpacity>
-
-          <Text style={styles.headerTitle}>
-            My Cart
-          </Text>
-
-          <View style={{ width: 28 }} />
-        </View>
-
-        {cartItems.length === 0 ? (
-          <View style={styles.empty}>
-            <MaterialCommunityIcons
-              name="cart-outline"
-              size={90}
-              color="#BBBBBB"
-            />
-
-            <Text style={styles.emptyTitle}>
-              Your cart is empty
-            </Text>
-
-            <TouchableOpacity
-              style={styles.shopButton}
-              onPress={goToShop}
-            >
-              <Text style={styles.shopText}>
-                Continue Shopping
-              </Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <>
-            <FlatList
-              data={cartItems}
-              keyExtractor={(item) => item.id}
-              renderItem={renderItem}
-              contentContainerStyle={{
-                padding: 20,
-              }}
-            />
-
-            {/* Summary */}
-
-            <View style={styles.summary}>
-              <View style={styles.row}>
-                <Text>Subtotal</Text>
-
-                <Text>
-                  ৳{totalPrice.toFixed(2)}
-                </Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text>Shipping</Text>
-
-                <Text>
-                  ৳{shipping.toFixed(2)}
-                </Text>
-              </View>
-
-              <View style={styles.row}>
-                <Text>Tax</Text>
-
-                <Text>
-                  ৳{tax.toFixed(2)}
-                </Text>
-              </View>
-
-              <View
-                style={styles.divider}
-              />
-
-              <View style={styles.row}>
-                <Text style={styles.total}>
-                  Total
-                </Text>
-
-                <Text style={styles.total}>
-                  ৳{grandTotal.toFixed(2)}
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                style={styles.checkoutButton}
-                onPress={() =>
-                  navigation.navigate(
-                    "Checkout"
-                  )
-                }
-              >
-                <Text
-                  style={
-                    styles.checkoutText
-                  }
-                >
-                  Proceed to Checkout
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
-      </SafeAreaView>
-    </LinearGradient>
+          </SafeAreaView>
+        </>
+      )}
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-  },
-
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2E7D32",
-  },
-
-  card: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 15,
-    flexDirection: "row",
-    elevation: 4,
-  },
-
-  image: {
-    width: 90,
-    height: 90,
-    borderRadius: 15,
-  },
-
-  info: {
-    flex: 1,
-    marginLeft: 15,
-  },
-
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-
-  category: {
-    color: "#777",
-    marginVertical: 5,
-  },
-
-  price: {
-    color: "#FF9800",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-
+const styles = themed(() => ({
+  list: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 },
+  card: { marginBottom: 12 },
+  row: { flexDirection: "row", alignItems: "flex-start" },
+  image: { width: 88, height: 88, borderRadius: 14 },
+  info: { flex: 1, marginLeft: 12 },
+  metaRow: { flexDirection: "row", alignItems: "center", marginVertical: 4 },
   unitPill: {
-    alignSelf: "flex-start",
-    backgroundColor: "#E8F5E9",
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    marginBottom: 6,
+    backgroundColor: palette.greenCardFill,
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    marginLeft: 6,
   },
-
-  unitText: {
-    color: "#2E7D32",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-
-  quantityRow: {
-    flexDirection: "row",
+  stepper: { marginTop: 8 },
+  remove: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: palette.dangerBg,
     alignItems: "center",
-    marginTop: 10,
-  },
-
-  qtyButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#E8F5E9",
-    borderWidth: 1.5,
-    borderColor: "#2E7D32",
     justifyContent: "center",
-    alignItems: "center",
   },
-
-  quantity: {
-    marginHorizontal: 15,
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-
   summary: {
-    backgroundColor: "white",
+    backgroundColor: palette.surface,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    padding: 25,
-    elevation: 20,
+    borderTopWidth: 1.5,
+    borderColor: palette.edge,
+    paddingHorizontal: 24,
+    paddingTop: 22,
+    paddingBottom: 12,
+    ...shadow(16),
   },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-
-  divider: {
-    borderBottomWidth: 1,
-    borderColor: "#DDD",
-    marginVertical: 10,
-  },
-
-  total: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-
-  checkoutButton: {
-    backgroundColor: "#2E7D32",
-    marginTop: 20,
-    padding: 18,
-    borderRadius: 18,
-    alignItems: "center",
-  },
-
-  checkoutText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-
-  empty: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  emptyTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 20,
-    color: "#666",
-  },
-
-  shopButton: {
-    marginTop: 30,
-    backgroundColor: "#2E7D32",
-    paddingHorizontal: 30,
-    paddingVertical: 15,
-    borderRadius: 20,
-  },
-
-  shopText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});
+  sumRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  divider: { height: 1, backgroundColor: tealA(0.15), marginVertical: 6 },
+  checkout: { marginTop: 12 },
+}));

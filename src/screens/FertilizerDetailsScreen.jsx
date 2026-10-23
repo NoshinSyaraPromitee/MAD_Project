@@ -1,266 +1,146 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { Image, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import GradientBackground from "../components/GradientBackground";
+import BackButton from "../components/BackButton";
+import SectionTitle from "../components/SectionTitle";
 import { fertilizerSafetyTips } from "../data/fertilizers";
+import { palette, tealA } from "../theme/colors";
+import { fredoka, inter } from "../theme/typography";
+import { themed } from "../theme/themed";
 
-export default function FertilizerDetailsScreen({ route, navigation }) {
-  const { fertilizer } = route.params;
+function Block({ children, warn }) {
+  return <View style={[styles.block, warn && styles.warn]}>{children}</View>;
+}
 
+function Line({ icon, color, text }) {
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {/* Header image */}
-
-          <View>
-            <Image
-              source={{ uri: fertilizer.image }}
-              style={styles.heroImage}
-            />
-
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-            >
-              <MaterialCommunityIcons
-                name="arrow-left"
-                size={24}
-                color="#2E7D32"
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.content}>
-            <Text style={styles.title}>{fertilizer.name}</Text>
-
-            <View style={styles.purposeRow}>
-              <MaterialCommunityIcons name="target" size={16} color="#2E7D32" />
-              <Text style={styles.purpose}>{fertilizer.purpose}</Text>
-            </View>
-
-            <View style={styles.tag}>
-              <MaterialCommunityIcons name="molecule" size={14} color="#558B2F" />
-              <Text style={styles.tagText}>{fertilizer.nutrient}</Text>
-            </View>
-
-            {/* Ingredients */}
-
-            <Text style={styles.sectionTitle}>Ingredients</Text>
-
-            <View style={styles.card}>
-              {fertilizer.ingredients.map((ingredient) => (
-                <View key={ingredient} style={styles.listRow}>
-                  <MaterialCommunityIcons
-                    name="circle-small"
-                    size={22}
-                    color="#43A047"
-                  />
-
-                  <Text style={styles.listText}>{ingredient}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Preparation */}
-
-            <Text style={styles.sectionTitle}>Preparation</Text>
-
-            <View style={styles.card}>
-              {fertilizer.preparation.map((step, index) => (
-                <View key={step} style={styles.stepRow}>
-                  <View style={styles.stepNumber}>
-                    <Text style={styles.stepNumberText}>{index + 1}</Text>
-                  </View>
-
-                  <Text style={styles.listText}>{step}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Application */}
-
-            <Text style={styles.sectionTitle}>Application</Text>
-
-            <View style={styles.card}>
-              <View style={styles.listRow}>
-                <MaterialCommunityIcons
-                  name="watering-can-outline"
-                  size={20}
-                  color="#42A5F5"
-                />
-
-                <Text style={styles.listText}>{fertilizer.application}</Text>
-              </View>
-            </View>
-
-            {/* Benefits */}
-
-            <Text style={styles.sectionTitle}>Benefits</Text>
-
-            <View style={styles.card}>
-              {fertilizer.benefits.map((benefit) => (
-                <View key={benefit} style={styles.listRow}>
-                  <MaterialCommunityIcons
-                    name="check-circle"
-                    size={18}
-                    color="#43A047"
-                  />
-
-                  <Text style={styles.listText}>{benefit}</Text>
-                </View>
-              ))}
-            </View>
-
-            {/* Safety Tips */}
-
-            <Text style={styles.sectionTitle}>Safety Tips</Text>
-
-            <View style={[styles.card, styles.safetyCard]}>
-              {fertilizerSafetyTips.map((tip) => (
-                <View key={tip} style={styles.listRow}>
-                  <MaterialCommunityIcons
-                    name="alert-outline"
-                    size={18}
-                    color="#FB8C00"
-                  />
-
-                  <Text style={styles.listText}>{tip}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+    <View style={styles.line}>
+      <MaterialCommunityIcons name={icon} size={18} color={color} style={styles.lineIcon} />
+      <Text style={[inter(14, "500", palette.textDark, { lineHeight: 21 }), styles.flex]}>{text}</Text>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  heroImage: {
-    width: "100%",
-    height: 240,
-    backgroundColor: "#EEE",
-  },
+export default function FertilizerDetailsScreen({ route }) {
+  const { fertilizer } = route.params;
 
-  backButton: {
-    position: "absolute",
-    top: 16,
-    left: 16,
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-    elevation: 4,
-  },
+  return (
+    <GradientBackground>
+      <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+        <View>
+          <Image source={{ uri: fertilizer.image }} style={styles.hero} />
+          <SafeAreaView edges={["top"]} style={styles.headerOverlay}>
+            <BackButton />
+          </SafeAreaView>
+        </View>
 
-  content: {
-    padding: 20,
-    paddingTop: 22,
-  },
+        <View style={styles.sheet}>
+          <Text style={fredoka(28, "700", palette.ink)}>{fertilizer.name}</Text>
 
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#222",
-  },
+          <View style={[styles.row, styles.mt8]}>
+            <MaterialCommunityIcons name="target" size={16} color={palette.accent} />
+            <Text style={[inter(14, "700", palette.accent), styles.ml6]}>{fertilizer.purpose}</Text>
+          </View>
 
-  purposeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
-  },
+          <View style={styles.tag}>
+            <MaterialCommunityIcons name="molecule" size={14} color={palette.accent} />
+            <Text style={[inter(12, "800", palette.accent), styles.ml6]}>{fertilizer.nutrient}</Text>
+          </View>
 
-  purpose: {
-    marginLeft: 6,
-    color: "#2E7D32",
-    fontWeight: "600",
-  },
+          <SectionTitle title="Ingredients" onCard />
+          <Block>
+            {fertilizer.ingredients.map((ingredient) => (
+              <Line key={ingredient} icon="circle-medium" color="#43A047" text={ingredient} />
+            ))}
+          </Block>
 
+          <SectionTitle title="Preparation" onCard />
+          <Block>
+            {fertilizer.preparation.map((step, index) => (
+              <View key={step} style={styles.step}>
+                <View style={styles.stepNum}>
+                  <Text style={inter(12, "800", palette.cream)}>{index + 1}</Text>
+                </View>
+                <Text style={[inter(14, "500", palette.textDark, { lineHeight: 21 }), styles.flex]}>
+                  {step}
+                </Text>
+              </View>
+            ))}
+          </Block>
+
+          <SectionTitle title="Application" onCard />
+          <Block>
+            <Line icon="watering-can-outline" color={palette.waterBlue} text={fertilizer.application} />
+          </Block>
+
+          <SectionTitle title="Benefits" onCard />
+          <Block>
+            {fertilizer.benefits.map((benefit) => (
+              <Line key={benefit} icon="check-circle" color="#43A047" text={benefit} />
+            ))}
+          </Block>
+
+          <SectionTitle title="Safety Tips" onCard />
+          <Block warn>
+            {fertilizerSafetyTips.map((tip) => (
+              <Line key={tip} icon="alert-outline" color="#FB8C00" text={tip} />
+            ))}
+          </Block>
+        </View>
+      </ScrollView>
+    </GradientBackground>
+  );
+}
+
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  row: { flexDirection: "row", alignItems: "center" },
+  mt8: { marginTop: 8 },
+  ml6: { marginLeft: 6 },
+  hero: { width: "100%", height: 260, backgroundColor: tealA(0.2) },
+  headerOverlay: { position: "absolute", top: 0, left: 16, paddingTop: 8 },
+  sheet: {
+    marginTop: -28,
+    backgroundColor: palette.surface,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 48,
+    minHeight: 500,
+  },
   tag: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    backgroundColor: "#F1F8E9",
-    borderRadius: 12,
+    backgroundColor: palette.greenCardFill,
+    borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6,
     marginTop: 12,
   },
-
-  tagText: {
-    marginLeft: 5,
-    fontSize: 12,
-    color: "#558B2F",
-    fontWeight: "600",
-  },
-
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginTop: 26,
-    marginBottom: 12,
-  },
-
-  card: {
-    backgroundColor: "white",
+  block: {
+    backgroundColor: palette.surfaceAlt,
     borderRadius: 18,
-    padding: 16,
-    elevation: 3,
+    padding: 14,
+    paddingBottom: 4,
+    borderWidth: 1,
+    borderColor: palette.greenCardFill,
   },
-
-  safetyCard: {
-    backgroundColor: "#FFF8E1",
-  },
-
-  listRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 10,
-  },
-
-  listText: {
-    flex: 1,
-    marginLeft: 8,
-    color: "#444",
-    lineHeight: 20,
-  },
-
-  stepRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    marginBottom: 14,
-  },
-
-  stepNumber: {
+  warn: { backgroundColor: palette.warnBg, borderColor: palette.warnBorder },
+  line: { flexDirection: "row", alignItems: "flex-start", marginBottom: 10 },
+  lineIcon: { marginRight: 8, marginTop: 2 },
+  step: { flexDirection: "row", alignItems: "flex-start", marginBottom: 12 },
+  stepNum: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: "#2E7D32",
-    justifyContent: "center",
+    backgroundColor: palette.teal,
     alignItems: "center",
+    justifyContent: "center",
     marginRight: 10,
   },
-
-  stepNumberText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-});
+}));

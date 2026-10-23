@@ -1,103 +1,99 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
-  View,
+  Animated,
+  Easing,
+  ScrollView,
   Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
-  Image,
+  View,
+  useWindowDimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { LinearGradient } from "expo-linear-gradient";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import GradientBackground from "../components/GradientBackground";
+import MascotCard from "../components/MascotCard";
+import AppButton from "../components/AppButton";
+import { palette, creamA } from "../theme/colors";
+import { inter, type } from "../theme/typography";
+import { themed } from "../theme/themed";
 
 export default function LandingScreen({ navigation }) {
+  const { width, height } = useWindowDimensions();
+  const float = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(float, {
+          toValue: 1,
+          duration: 1400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(float, {
+          toValue: 0,
+          duration: 1400,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [float]);
+
+  const cardSize = Math.max(200, Math.min(320, Math.min(width * 0.72, height * 0.4)));
+  const translateY = float.interpolate({ inputRange: [0, 1], outputRange: [0, -10] });
+
   return (
-    <LinearGradient
-      colors={["#FFE6B7", "#E8FFD9", "#FFF0D1"]}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.safeArea}>
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/images/Hello.gif")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-
-          <Text style={styles.title}>MyPlantPal</Text>
-        </View>
-
-        {/* Get Started Button */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Login")}
+    <GradientBackground>
+      <SafeAreaView style={styles.flex}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.buttonText}>Get Started</Text>
+          <Animated.View style={{ transform: [{ translateY }] }}>
+            <MascotCard size={cardSize} />
+          </Animated.View>
 
-          <MaterialCommunityIcons
-            name="arrow-right-circle"
-            size={26}
-            color="white"
-          />
-        </TouchableOpacity>
+          <Text style={[type.hero, styles.title]} numberOfLines={1} adjustsFontSizeToFit>
+            MyPlantPal
+          </Text>
+
+          <Text style={[inter(15, "700", creamA(0.92)), styles.tagline]}>
+            Your Friendly AI Gardening Assistant
+          </Text>
+
+          <View style={styles.buttonWrap}>
+            <AppButton
+              label="Get Started"
+              variant="outline"
+              rightIcon="arrow-right-circle-outline"
+              onPress={() => navigation.navigate("Login")}
+              style={styles.button}
+            />
+          </View>
+        </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
+    </GradientBackground>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
-  safeArea: {
-    flex: 1,
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    paddingHorizontal: 30,
-  },
-
-  logoContainer: {
-    alignItems: "center",
-  },
-
-  logo: {
-    width: 280,
-    height: 280,
-  },
-
-  title: {
-    fontSize: 42,
-    fontWeight: "bold",
-    color: "#8B5E3C",
-    marginTop: 20,
-  },
-
-  subtitle: {
-    marginTop: 12,
-    fontSize: 17,
-    color: "#555",
-    textAlign: "center",
-    paddingHorizontal: 30,
-  },
-
-  button: {
-    flexDirection: "row",
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  content: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#2E7D32",
-    width: "100%",
-    paddingVertical: 18,
-    borderRadius: 20,
-    elevation: 8,
+    paddingHorizontal: 28,
+    paddingVertical: 24,
   },
-
-  buttonText: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "600",
-    marginRight: 10,
+  title: {
+    marginTop: 26,
+    textShadowColor: "rgba(0,0,0,0.25)",
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 12,
   },
-});
+  tagline: { marginTop: 6, textAlign: "center" },
+  buttonWrap: { alignSelf: "stretch", marginTop: 44, maxWidth: 460, width: "100%" },
+  button: { borderColor: palette.cream, borderRadius: 22, minHeight: 56 },
+}));

@@ -6,38 +6,44 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myplantpal",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#1B5A4B",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundColor": "#E6F4FE"
+        "backgroundColor": "#F8EFDE"
       },
-      "package": "com.anonymous.myplantpal"
+      "package": "com.anonymous.myplantpal",
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "output": "single"
     },
     "plugins": [
-  [
-    "expo-splash-screen",
-    {
-      "backgroundColor": "#208AEF",
-      "image": "./assets/images/splash-icon.png",
-      "imageWidth": 76
-    }
-  ],
-  [
-    "expo-image-picker",
-    {
-      "photosPermission": "Allow MyPlantPal to access your photos.",
-      "cameraPermission": "Allow MyPlantPal to use your camera."
-    }
-  ],
-  "expo-font",
-  "expo-status-bar"
-]
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#1B5A4B",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow MyPlantPal to access your photos.",
+          "cameraPermission": "Allow MyPlantPal to use your camera."
+        }
+      ],
+      "expo-font",
+      "expo-status-bar",
+      "expo-image",
+      "expo-secure-store",
+      "expo-web-browser",
+      "expo-asset"
+    ]
   }
 }

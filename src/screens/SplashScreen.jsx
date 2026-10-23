@@ -1,107 +1,92 @@
 import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  ActivityIndicator,
-} from "react-native";
+import { Animated, Easing, Text, View, useWindowDimensions } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { LinearGradient } from "expo-linear-gradient";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import GradientBackground from "../components/GradientBackground";
+import RiveMascot from "../components/RiveMascot";
+import { useAuth } from "../context/AuthContext";
+import { palette, creamA } from "../theme/colors";
+import { inter, type } from "../theme/typography";
+import { themed } from "../theme/themed";
 
 export default function SplashScreen({ navigation }) {
-  const scale = useRef(new Animated.Value(0.7)).current;
-  const opacity = useRef(new Animated.Value(0)).current;
+  const { width, height } = useWindowDimensions();
+  const { user, isLoading } = useAuth();
+
+  const fade = useRef(new Animated.Value(0)).current;
+  const bar = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.spring(scale, {
+    Animated.timing(fade, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+    Animated.loop(
+      Animated.timing(bar, {
         toValue: 1,
-        friction: 5,
+        duration: 1200,
+        easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-    ]).start();
+      })
+    ).start();
+  }, [fade, bar]);
 
+  useEffect(() => {
+    if (isLoading) return undefined;
     const timer = setTimeout(() => {
-      navigation.replace("Landing");
+      navigation.replace(user ? "MainTabs" : "Landing");
     }, 2200);
-
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading, user, navigation]);
+
+  const trackW = width * 0.42;
+  const translateX = bar.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-trackW * 0.4, trackW],
+  });
 
   return (
-    <LinearGradient
-      colors={["#FFE6B7", "#E8FFD9", "#FFF0D1"]}
-      style={styles.container}
-    >
-      <Animated.View
-        style={[
-          styles.logoContainer,
-          {
-            opacity,
-            transform: [{ scale }],
-          },
-        ]}
-      >
-        <MaterialCommunityIcons
-          name="flower"
-          size={110}
-          color="#2E7D32"
-        />
+    <GradientBackground>
+      <SafeAreaView style={styles.flex}>
+        <Animated.View style={[styles.flex, styles.center, { opacity: fade }]}>
+          <View style={{ height: height * 0.05 }} />
+          <Text style={[type.hero, styles.title]} numberOfLines={1} adjustsFontSizeToFit>
+            MyPlantPal
+          </Text>
+          <Text style={[inter(14, "700", palette.taglineTop), styles.tagline]}>
+            Your Friendly AI Gardening Assistant
+          </Text>
 
-        <Text style={styles.title}>
-          MyPlantPal
-        </Text>
+          <View style={styles.flex} />
+          <RiveMascot width={width * 0.5} />
+          <View style={styles.flex} />
 
-        <Text style={styles.subtitle}>
-          Your Friendly AI Gardening Assistant
-        </Text>
-      </Animated.View>
-
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator
-          size="large"
-          color="#2E7D32"
-        />
-      </View>
-    </LinearGradient>
+          <View style={[styles.track, { width: trackW }]}>
+            <Animated.View
+              style={[styles.thumb, { width: trackW * 0.4, transform: [{ translateX }] }]}
+            />
+          </View>
+          <Text style={[inter(12, "600", palette.cream), styles.loading]}>Loading...</Text>
+          <View style={{ height: height * 0.07 }} />
+        </Animated.View>
+      </SafeAreaView>
+    </GradientBackground>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  logoContainer: {
-    alignItems: "center",
-  },
-
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  center: { alignItems: "center" },
   title: {
-    fontSize: 42,
-    fontWeight: "bold",
-    color: "#8B5E3C",
-    marginTop: 20,
+    paddingHorizontal: 24,
+    textShadowColor: "rgba(0,0,0,0.25)",
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 12,
   },
-
-  subtitle: {
-    marginTop: 12,
-    fontSize: 17,
-    color: "#555",
-    textAlign: "center",
-    paddingHorizontal: 30,
+  tagline: { marginTop: 8, textAlign: "center" },
+  track: {
+    height: 4,
+    borderRadius: 4,
+    overflow: "hidden",
+    backgroundColor: creamA(0.35),
   },
-
-  loaderContainer: {
-    position: "absolute",
-    bottom: 70,
-  },
-});
+  thumb: { height: 4, borderRadius: 4, backgroundColor: palette.cream },
+  loading: { marginTop: 8 },
+}));

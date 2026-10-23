@@ -1,18 +1,22 @@
 import React, { useContext, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-} from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import AppScreen from "../components/AppScreen";
+import AppCard from "../components/AppCard";
+import AppTextField from "../components/AppTextField";
+import AppButton from "../components/AppButton";
+import SectionTitle from "../components/SectionTitle";
 import { CartContext } from "../context/CartContext";
+import { palette, tealA } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { BULLET, taka } from "../utils/format";
+import { themed } from "../theme/themed";
+
+const DELIVERY = {
+  Standard: { title: "Standard Delivery", eta: "3-5 Days", fee: 5.99, icon: "truck-outline" },
+  Express: { title: "Express Delivery", eta: "1-2 Days", fee: 12.99, icon: "truck-fast-outline" },
+};
 
 export default function CheckoutScreen({ navigation }) {
   const { totalPrice } = useContext(CartContext);
@@ -20,265 +24,108 @@ export default function CheckoutScreen({ navigation }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-
   const [delivery, setDelivery] = useState("Standard");
 
-  const shipping =
-    delivery === "Express" ? 12.99 : 5.99;
-
+  const shipping = DELIVERY[delivery].fee;
   const tax = totalPrice * 0.05;
-
   const total = totalPrice + shipping + tax;
 
+  const line = (label, value, bold) => (
+    <View style={styles.sumRow}>
+      <Text style={inter(bold ? 18 : 14, bold ? "800" : "500", palette.textDark)}>{label}</Text>
+      <Text style={inter(bold ? 18 : 14, bold ? "800" : "600", palette.textDark)}>{taka(value)}</Text>
+    </View>
+  );
+
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={styles.container}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header */}
+    <AppScreen title="Checkout" scroll>
+      <SectionTitle title="Shipping Information" />
+      <AppTextField icon="account-outline" placeholder="Full Name" value={name} onChangeText={setName} />
+      <AppTextField
+        icon="phone-outline"
+        placeholder="Phone Number"
+        value={phone}
+        onChangeText={setPhone}
+        keyboardType="phone-pad"
+      />
+      <AppTextField
+        icon="map-marker-outline"
+        placeholder="Shipping Address"
+        value={address}
+        onChangeText={setAddress}
+        multiline
+      />
 
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-            >
+      <SectionTitle title="Delivery Method" />
+      {Object.entries(DELIVERY).map(([key, d]) => {
+        const selected = delivery === key;
+        return (
+          <AppCard
+            key={key}
+            onPress={() => setDelivery(key)}
+            style={[styles.option, selected && styles.optionOn]}
+            color={selected ? palette.greenCardFill : undefined}
+          >
+            <View style={styles.row}>
+              <View style={styles.optIcon}>
+                <MaterialCommunityIcons name={d.icon} size={22} color={palette.accent} />
+              </View>
+              <View style={styles.flex}>
+                <Text style={inter(16, "700", palette.textDark)}>{d.title}</Text>
+                <Text style={inter(13, "500", palette.textMuted)}>
+                  {d.eta} {BULLET} {taka(d.fee)}
+                </Text>
+              </View>
               <MaterialCommunityIcons
-                name="arrow-left"
-                size={28}
-                color="#2E7D32"
+                name={selected ? "radiobox-marked" : "radiobox-blank"}
+                size={24}
+                color={palette.accent}
               />
-            </TouchableOpacity>
-
-            <Text style={styles.title}>
-              Checkout
-            </Text>
-
-            <View style={{ width: 28 }} />
-          </View>
-
-          {/* Shipping Information */}
-
-          <Text style={styles.sectionTitle}>
-            Shipping Information
-          </Text>
-
-          <TextInput
-            placeholder="Full Name"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-          />
-
-          <TextInput
-            placeholder="Phone Number"
-            value={phone}
-            onChangeText={setPhone}
-            keyboardType="phone-pad"
-            style={styles.input}
-          />
-
-          <TextInput
-            placeholder="Shipping Address"
-            value={address}
-            onChangeText={setAddress}
-            multiline
-            style={[styles.input, { height: 100 }]}
-          />
-
-          {/* Delivery */}
-
-          <Text style={styles.sectionTitle}>
-            Delivery Method
-          </Text>
-
-          <TouchableOpacity
-            style={[
-              styles.deliveryCard,
-              delivery === "Standard" &&
-                styles.selected,
-            ]}
-            onPress={() =>
-              setDelivery("Standard")
-            }
-          >
-            <Text style={styles.deliveryTitle}>
-              Standard Delivery
-            </Text>
-
-            <Text>3-5 Days • ৳ 60</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.deliveryCard,
-              delivery === "Express" &&
-                styles.selected,
-            ]}
-            onPress={() =>
-              setDelivery("Express")
-            }
-          >
-            <Text style={styles.deliveryTitle}>
-              Express Delivery
-            </Text>
-
-            <Text>1-2 Days • ৳12.99</Text>
-          </TouchableOpacity>
-
-          {/* Summary */}
-
-          <Text style={styles.sectionTitle}>
-            Order Summary
-          </Text>
-
-          <View style={styles.summary}>
-            <View style={styles.row}>
-              <Text>Subtotal</Text>
-              <Text>৳{totalPrice.toFixed(2)}</Text>
             </View>
+          </AppCard>
+        );
+      })}
 
-            <View style={styles.row}>
-              <Text>Shipping</Text>
-              <Text>৳{shipping.toFixed(2)}</Text>
-            </View>
+      <SectionTitle title="Order Summary" />
+      <AppCard>
+        {line("Subtotal", totalPrice)}
+        {line("Shipping", shipping)}
+        {line("Tax (5%)", tax)}
+        <View style={styles.divider} />
+        {line("Total", total, true)}
+      </AppCard>
 
-            <View style={styles.row}>
-              <Text>Tax</Text>
-              <Text>৳{tax.toFixed(2)}</Text>
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.row}>
-              <Text style={styles.total}>
-                Total
-              </Text>
-
-              <Text style={styles.total}>
-              ৳{total.toFixed(2)}
-              </Text>
-            </View>
-          </View>
-
-          {/* Continue */}
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate("Payment", {
-                customer: {
-                  name,
-                  phone,
-                  address,
-                },
-                delivery,
-                total,
-              })
-            }
-          >
-            <Text style={styles.buttonText}>
-              Continue to Payment
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+      <AppButton
+        label="Continue to Payment"
+        rightIcon="arrow-right"
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate("Payment", {
+            customer: { name, phone, address },
+            delivery,
+            total,
+          })
+        }
+      />
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    paddingBottom: 40,
-  },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  row: { flexDirection: "row", alignItems: "center" },
+  option: { marginBottom: 12, borderWidth: 2, borderColor: "transparent" },
+  optionOn: { borderColor: palette.accent },
+  optIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: tealA(0.1),
     alignItems: "center",
-    marginBottom: 25,
+    justifyContent: "center",
+    marginRight: 12,
   },
-
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "#2E7D32",
-  },
-
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 15,
-    marginTop: 10,
-    color: "#2E7D32",
-  },
-
-  input: {
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    padding: 15,
-    marginBottom: 15,
-    fontSize: 16,
-  },
-
-  deliveryCard: {
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 15,
-    borderWidth: 2,
-    borderColor: "transparent",
-  },
-
-  selected: {
-    borderColor: "#2E7D32",
-  },
-
-  deliveryTitle: {
-    fontWeight: "bold",
-    fontSize: 17,
-    marginBottom: 5,
-  },
-
-  summary: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 20,
-    marginTop: 10,
-  },
-
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-
-  divider: {
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
-    marginVertical: 10,
-  },
-
-  total: {
-    fontWeight: "bold",
-    fontSize: 20,
-  },
-
-  button: {
-    backgroundColor: "#2E7D32",
-    marginTop: 30,
-    padding: 18,
-    borderRadius: 20,
-    alignItems: "center",
-  },
-
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 18,
-  },
-});
+  sumRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+  divider: { height: 1, backgroundColor: tealA(0.15), marginVertical: 6 },
+  button: { marginTop: 24 },
+}));

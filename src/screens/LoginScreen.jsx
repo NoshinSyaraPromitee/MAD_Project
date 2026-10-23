@@ -1,17 +1,25 @@
 import React, { useState } from "react";
 import {
-  View,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
   Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  Image,
+  View,
 } from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import GradientBackground from "../components/GradientBackground";
+import BackButton from "../components/BackButton";
+import MascotCard from "../components/MascotCard";
+import AppTextField from "../components/AppTextField";
+import AppButton from "../components/AppButton";
 import { useAuth } from "../context/AuthContext";
+import { palette, creamA } from "../theme/colors";
+import { fredoka, inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { themed } from "../theme/themed";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -21,15 +29,14 @@ export default function LoginScreen({ navigation }) {
   const { loginWithGoogle } = useAuth();
 
   const handleGoogleLogin = async () => {
-    alert("Button pressed"); // TEMPORARY — remove once confirmed working
+    alert("Button pressed"); // TEMPORARY - remove once confirmed working
     setGoogleLoading(true);
     try {
       const result = await loginWithGoogle();
       if (result.success) {
         navigation.replace("MainTabs");
       }
-      // result.success === false means cancelled or failed silently —
-      // nothing to navigate, user stays on this screen.
+      // result.success === false means cancelled or failed silently.
     } catch (err) {
       console.error("Google login failed:", err);
     } finally {
@@ -38,243 +45,121 @@ export default function LoginScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient
-      colors={["#FFF3D6", "#ECFFD8", "#FFF6E5"]}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.safeArea}>
-        {/* Back button */}
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+    <GradientBackground>
+      <SafeAreaView style={styles.flex}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          <MaterialCommunityIcons
-            name="arrow-left"
-            size={28}
-            color="#2E7D32"
-          />
-        </TouchableOpacity>
+          <View style={styles.topBar}>
+            <BackButton />
+          </View>
 
-        <View style={styles.header}>
-          <Image
-            source={require("../../assets/images/login.gif")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <ScrollView
+            contentContainerStyle={styles.content}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.header}>
+              <MascotCard size={130} glow={false} leaves={false} />
+              <Text style={[fredoka(34, "700", palette.cream), styles.title]}>Welcome Back!</Text>
+              <Text style={inter(15, "600", creamA(0.92))}>Missing your buddies?</Text>
+            </View>
 
-          <Text style={styles.title}>Welcome Back!</Text>
-
-          <Text style={styles.subtitle}>Missing your buddies?</Text>
-        </View>
-
-        {/* Email */}
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="email-outline"
-            size={22}
-            color="#2E7D32"
-          />
-
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-        </View>
-
-        {/* Password */}
-        <View style={styles.inputContainer}>
-          <MaterialCommunityIcons
-            name="lock-outline"
-            size={22}
-            color="#2E7D32"
-          />
-
-          <TextInput
-            placeholder="Password"
-            value={password}
-            secureTextEntry={hidePassword}
-            onChangeText={setPassword}
-            style={styles.input}
-          />
-
-          <TouchableOpacity onPress={() => setHidePassword(!hidePassword)}>
-            <MaterialCommunityIcons
-              name={hidePassword ? "eye-off-outline" : "eye-outline"}
-              size={22}
-              color="#777"
+            <AppTextField
+              icon="email-outline"
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
-          </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity>
-          <Text style={styles.forgot}>Forgot Password?</Text>
-        </TouchableOpacity>
+            <AppTextField
+              icon="lock-outline"
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={hidePassword}
+              right={
+                <Pressable onPress={() => setHidePassword(!hidePassword)} hitSlop={10}>
+                  <MaterialCommunityIcons
+                    name={hidePassword ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color={palette.textMuted}
+                  />
+                </Pressable>
+              }
+            />
 
-        {/* Login */}
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => navigation.replace("MainTabs")}
-        >
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
+            <Pressable style={styles.forgotWrap} hitSlop={8}>
+              <Text style={inter(13, "700", palette.cream)}>Forgot Password?</Text>
+            </Pressable>
 
-        {/* Divider */}
-        <View style={styles.divider}>
-          <View style={styles.line} />
-          <Text style={styles.or}>OR</Text>
-          <View style={styles.line} />
-        </View>
+            <AppButton label="Login" onPress={() => navigation.replace("MainTabs")} />
 
-        {/* Google */}
-        <TouchableOpacity
-          style={styles.googleButton}
-          onPress={handleGoogleLogin}
-          disabled={googleLoading}
-        >
-          <MaterialCommunityIcons name="google" size={22} color="#DB4437" />
-          <Text style={styles.googleText}>
-            {googleLoading ? "Signing in..." : "Continue with Google"}
-          </Text>
-        </TouchableOpacity>
+            <View style={styles.divider}>
+              <View style={styles.line} />
+              <Text style={[inter(13, "700", palette.cream), styles.or]}>OR</Text>
+              <View style={styles.line} />
+            </View>
 
-        <View style={styles.footer}>
-          <Text>Don't have an account?</Text>
+            <Pressable
+              style={({ pressed }) => [styles.googleButton, pressed && { opacity: 0.9 }]}
+              onPress={handleGoogleLogin}
+              disabled={googleLoading}
+            >
+              <MaterialCommunityIcons name="google" size={22} color="#DB4437" />
+              <Text style={[inter(15, "700", palette.textDark), styles.googleText]}>
+                {googleLoading ? "Signing in..." : "Continue with Google"}
+              </Text>
+            </Pressable>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-            <Text style={styles.register}>Register</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.footer}>
+              <Text style={inter(14, "600", palette.cream)}>Don't have an account?</Text>
+              <Pressable onPress={() => navigation.navigate("Register")} hitSlop={8}>
+                <Text style={[inter(14, "800", palette.cream), styles.link]}>Register</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
-    </LinearGradient>
+    </GradientBackground>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
-  safeArea: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 25,
-  },
-
-  backButton: {
-    position: "absolute",
-    top: 10,
-    left: 25,
-    zIndex: 10,
-    padding: 5,
-  },
-
-  header: {
-    alignItems: "center",
-    marginBottom: 40,
-  },
-
-  logo: {
-    width: 140,
-    height: 140,
-  },
-
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  topBar: { paddingHorizontal: 16, paddingTop: 8 },
+  content: { flexGrow: 1, justifyContent: "center", paddingHorizontal: 24, paddingBottom: 32 },
+  header: { alignItems: "center", marginBottom: 26 },
   title: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#2E7D32",
-    marginTop: 15,
+    marginTop: 6,
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 8,
   },
-
-  subtitle: {
-    marginTop: 8,
-    color: "#666",
-    fontSize: 16,
-  },
-
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    height: 58,
-    elevation: 4,
-  },
-
-  input: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 16,
-  },
-
-  forgot: {
-    alignSelf: "flex-end",
-    color: "#2E7D32",
-    marginBottom: 30,
-    fontWeight: "600",
-  },
-
-  loginButton: {
-    backgroundColor: "#2E7D32",
-    height: 58,
-    borderRadius: 15,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  loginText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 18,
-  },
-
-  divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 30,
-  },
-
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#bbb",
-  },
-
-  or: {
-    marginHorizontal: 15,
-    color: "#888",
-  },
-
+  forgotWrap: { alignSelf: "flex-end", marginBottom: 20 },
+  divider: { flexDirection: "row", alignItems: "center", marginVertical: 24 },
+  line: { flex: 1, height: 1.5, backgroundColor: creamA(0.5) },
+  or: { marginHorizontal: 14 },
   googleButton: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
-    height: 56,
-    borderRadius: 15,
-    elevation: 3,
+    justifyContent: "center",
+    backgroundColor: palette.surface,
+    minHeight: 54,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: palette.edge,
+    ...shadow(3),
   },
-
-  googleText: {
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-
+  googleText: { marginLeft: 10 },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 35,
+    alignItems: "center",
+    marginTop: 28,
   },
-
-  register: {
-    marginLeft: 5,
-    color: "#2E7D32",
-    fontWeight: "700",
-  },
-});
+  link: { marginLeft: 6, textDecorationLine: "underline" },
+}));

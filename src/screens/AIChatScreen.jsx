@@ -1,17 +1,20 @@
-import { LinearGradient } from "expo-linear-gradient";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    View
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  View,
 } from "react-native";
 
+import AppScreen from "../components/AppScreen";
 import ChatBubble from "../components/ChatBubble.jsx";
 import ChatInput from "../components/ChatInput.jsx";
 import { analyzePlantImage, getBotResponse } from "../services/chatApi";
+import { palette, creamA } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { themed } from "../theme/themed";
 
 export default function AIChatScreen() {
   const [messages, setMessages] = useState([
@@ -22,9 +25,9 @@ export default function AIChatScreen() {
       suggestedChips: [
         "Why are my leaves yellow?",
         "Homemade Banana Fertilizer",
-        "Treat Leaf Spot"
-      ]
-    }
+        "Treat Leaf Spot",
+      ],
+    },
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -34,8 +37,8 @@ export default function AIChatScreen() {
     const userMsg = {
       id: String(Date.now()),
       sender: "user",
-      text: text?.trim() || (imageUri ? "📷 Photo sent" : ""),
-      imageUri: imageUri || null
+      text: text?.trim() || (imageUri ? "\uD83D\uDCF7 Photo sent" : ""),
+      imageUri: imageUri || null,
     };
 
     setMessages((prev) => [userMsg, ...prev]);
@@ -53,9 +56,9 @@ export default function AIChatScreen() {
         {
           id: String(Date.now() + 1),
           sender: "bot",
-          text: "Something went wrong on my end. Please try again."
+          text: "Something went wrong on my end. Please try again.",
         },
-        ...prev
+        ...prev,
       ]);
     } finally {
       setIsTyping(false);
@@ -67,12 +70,11 @@ export default function AIChatScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={styles.gradientContainer}
-    >
-      <SafeAreaView style={styles.container}>
-        {/* Chat Feed */}
+    <AppScreen title="AI Doctor" padded={false} edges={["top"]}>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
         <FlatList
           data={messages}
           keyExtractor={(item) => item.id}
@@ -81,44 +83,39 @@ export default function AIChatScreen() {
           )}
           inverted
           contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
         />
 
-        {isTyping && (
+        {isTyping ? (
           <View style={styles.typingBox}>
-            <ActivityIndicator size="small" color="#2E7D32" />
-            <Text style={styles.typingText}>PlantBot is analyzing...</Text>
+            <ActivityIndicator size="small" color={palette.cream} />
+            <Text style={[inter(13, "600", palette.cream), styles.typingText]}>
+              PlantBot is analyzing...
+            </Text>
           </View>
-        )}
+        ) : null}
 
-        {/* Modular Input Bar (+ Icon, Image Preview, & Send Button) */}
         <ChatInput onSendMessage={handleSend} />
-      </SafeAreaView>
-    </LinearGradient>
+      </KeyboardAvoidingView>
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  gradientContainer: {
-    flex: 1
-  },
-  container: {
-    flex: 1,
-    justifyContent: "space-between"
-  },
-  listContent: {
-    paddingHorizontal: 16,
-    paddingVertical: 12
-  },
+const styles = themed(() => ({
+  flex: { flex: 1 },
+  listContent: { paddingHorizontal: 16, paddingVertical: 12 },
   typingBox: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 8
+    alignSelf: "flex-start",
+    marginLeft: 16,
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(27,90,75,0.55)",
+    borderWidth: 1,
+    borderColor: creamA(0.4),
   },
-  typingText: {
-    fontSize: 13,
-    color: "#7A7A7A",
-    marginLeft: 8,
-    fontWeight: "500"
-  }
-});
+  typingText: { marginLeft: 8 },
+}));

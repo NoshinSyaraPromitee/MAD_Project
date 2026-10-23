@@ -1,34 +1,32 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { Image, Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import AppScreen from "../components/AppScreen";
+import AppCard from "../components/AppCard";
+import EmptyView from "../components/EmptyView";
 import myPlants from "../data/myPlants";
+import { palette, creamA } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { BULLET } from "../utils/format";
+import { themed } from "../theme/themed";
 
-const actionMeta = {
-  scan: { icon: "leaf-maple", color: "#2E7D32", label: "AI Scan" },
-  water: { icon: "water", color: "#42A5F5", label: "Watered" },
-  fertilize: { icon: "flask", color: "#8D6E63", label: "Fertilized" },
-};
+const getActionMeta = () => ({
+  scan: { icon: "leaf-maple", color: palette.accent, label: "AI Scan" },
+  water: { icon: "water", color: palette.waterBlue, label: "Watered" },
+  fertilize: { icon: "flask", color: palette.brown, label: "Fertilized" },
+});
 
 // Build a simple activity log from each plant's known fields.
 function buildHistory() {
-  const entries = myPlants.flatMap((plant) => [
+  return myPlants.flatMap((plant) => [
     {
       id: `${plant.id}-scan`,
       plant,
       action: "scan",
       when: plant.lastScan,
-      note: `${plant.status} • ${plant.health}% health`,
+      note: `${plant.status} ${BULLET} ${plant.health}% health`,
     },
     {
       id: `${plant.id}-water`,
@@ -38,220 +36,77 @@ function buildHistory() {
       note: `Next watering ${plant.nextWatering}`,
     },
   ]);
-
-  return entries;
 }
 
 export default function PlantHistoryScreen({ navigation }) {
   const history = buildHistory();
+  const actionMeta = getActionMeta();
 
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={{ flex: 1 }}
-    >
-      <SafeAreaView style={styles.container}>
-        {/* Header */}
+    <AppScreen title="Plant History" scroll>
+      {history.length === 0 ? (
+        <EmptyView icon="history" title="No activity yet" subtitle="Scan a plant to get started!" />
+      ) : (
+        <View style={styles.timeline}>
+          {history.map((entry, index) => {
+            const meta = actionMeta[entry.action];
+            const isLast = index === history.length - 1;
 
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={28}
-              color="#2E7D32"
-            />
-          </TouchableOpacity>
+            return (
+              <View key={entry.id} style={styles.entryRow}>
+                <View style={styles.track}>
+                  <View style={[styles.dot, { backgroundColor: meta.color }]}>
+                    <MaterialCommunityIcons name={meta.icon} size={16} color={palette.white} />
+                  </View>
+                  {!isLast ? <View style={styles.line} /> : null}
+                </View>
 
-          <Text style={styles.headerTitle}>
-            Plant History
-          </Text>
-
-          <View style={{ width: 28 }} />
+                <AppCard
+                  style={styles.card}
+                  padding={12}
+                  onPress={() => navigation.navigate("PlantDetails", { plant: entry.plant })}
+                >
+                  <View style={styles.row}>
+                    <Image source={{ uri: entry.plant.image }} style={styles.thumb} />
+                    <View style={styles.info}>
+                      <Text style={inter(15, "700", palette.textDark)} numberOfLines={1}>
+                        {meta.label} {BULLET} {entry.plant.nickname}
+                      </Text>
+                      <Text style={[inter(13, "500", palette.textMuted), styles.note]} numberOfLines={1}>
+                        {entry.note}
+                      </Text>
+                      <Text style={[inter(12, "700", meta.color), styles.when]}>{entry.when}</Text>
+                    </View>
+                  </View>
+                </AppCard>
+              </View>
+            );
+          })}
         </View>
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        >
-          {history.length === 0 ? (
-            <View style={styles.emptyState}>
-              <MaterialCommunityIcons
-                name="history"
-                size={50}
-                color="#AAA"
-              />
-
-              <Text style={styles.emptyText}>
-                No activity yet. Scan a plant to get started!
-              </Text>
-            </View>
-          ) : (
-            <View style={styles.timeline}>
-              {history.map((entry, index) => {
-                const meta = actionMeta[entry.action];
-                const isLast = index === history.length - 1;
-
-                return (
-                  <TouchableOpacity
-                    key={entry.id}
-                    style={styles.entryRow}
-                    activeOpacity={0.85}
-                    onPress={() =>
-                      navigation.navigate("PlantDetails", {
-                        plant: entry.plant,
-                      })
-                    }
-                  >
-                    <View style={styles.trackColumn}>
-                      <View
-                        style={[
-                          styles.dot,
-                          { backgroundColor: meta.color },
-                        ]}
-                      >
-                        <MaterialCommunityIcons
-                          name={meta.icon}
-                          size={16}
-                          color="white"
-                        />
-                      </View>
-
-                      {!isLast && <View style={styles.line} />}
-                    </View>
-
-                    <View style={styles.card}>
-                      <Image
-                        source={{ uri: entry.plant.image }}
-                        style={styles.thumb}
-                      />
-
-                      <View style={styles.info}>
-                        <Text style={styles.title}>
-                          {meta.label} • {entry.plant.nickname}
-                        </Text>
-
-                        <Text style={styles.note}>
-                          {entry.note}
-                        </Text>
-
-                        <Text style={styles.when}>
-                          {entry.when}
-                        </Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          )}
-        </ScrollView>
-      </SafeAreaView>
-    </LinearGradient>
+      )}
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 10,
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#2E7D32",
-  },
-
-  timeline: {
-    marginTop: 5,
-  },
-
-  entryRow: {
-    flexDirection: "row",
-  },
-
-  trackColumn: {
-    alignItems: "center",
-    width: 36,
-  },
-
+const styles = themed(() => ({
+  timeline: { marginTop: 10 },
+  entryRow: { flexDirection: "row" },
+  track: { alignItems: "center", width: 36 },
   dot: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: palette.cream,
     alignItems: "center",
-    elevation: 3,
-  },
-
-  line: {
-    width: 2,
-    flex: 1,
-    backgroundColor: "#DDD",
-    marginTop: 4,
-    marginBottom: 4,
-  },
-
-  card: {
-    flex: 1,
-    backgroundColor: "white",
-    borderRadius: 18,
-    padding: 14,
-    marginLeft: 12,
-    marginBottom: 16,
-    flexDirection: "row",
-    elevation: 3,
-  },
-
-  thumb: {
-    width: 55,
-    height: 55,
-    borderRadius: 14,
-  },
-
-  info: {
-    flex: 1,
-    marginLeft: 12,
     justifyContent: "center",
+    ...shadow(3),
   },
-
-  title: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-  },
-
-  note: {
-    marginTop: 3,
-    color: "#777",
-    fontSize: 13,
-  },
-
-  when: {
-    marginTop: 4,
-    color: "#43A047",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-
-  emptyState: {
-    alignItems: "center",
-    marginTop: 60,
-  },
-
-  emptyText: {
-    marginTop: 12,
-    color: "#555",
-    fontSize: 15,
-    textAlign: "center",
-    paddingHorizontal: 30,
-  },
-});
+  line: { width: 2, flex: 1, backgroundColor: creamA(0.6), marginVertical: 4 },
+  card: { flex: 1, marginLeft: 12, marginBottom: 14 },
+  row: { flexDirection: "row", alignItems: "center" },
+  thumb: { width: 56, height: 56, borderRadius: 14 },
+  info: { flex: 1, marginLeft: 12 },
+  note: { marginTop: 3 },
+  when: { marginTop: 4 },
+}));

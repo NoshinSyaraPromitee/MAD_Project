@@ -1,162 +1,149 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import React, { useState } from "react";
 import {
-    Alert,
-    Image,
-    Modal,
-    Platform,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-import { colors } from '../theme/colors';
+  Alert,
+  Image,
+  Modal,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+
+import { palette, tealA } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { themed } from "../theme/themed";
 
 export default function ChatInput({ onSendMessage }) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null); // { uri }
 
   const closeMenu = () => setMenuVisible(false);
-  const handlePlusPress = () => setMenuVisible(true);
+  const canSend = !!text.trim() || !!selectedImage;
 
   const handleSend = () => {
-    if (!text.trim() && !selectedImage) return;
-
+    if (!canSend) return;
     onSendMessage({
       text: text.trim(),
       imageUri: selectedImage?.uri || null,
     });
-
-    setText('');
+    setText("");
     setSelectedImage(null);
   };
 
   const openGallery = async () => {
     closeMenu();
-
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert('Permission Needed', 'Gallery access is required to upload plant photos.');
+        Alert.alert("Permission Needed", "Gallery access is required to upload plant photos.");
         return;
       }
-
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.8,
       });
-
       if (!result.canceled && result.assets?.[0]?.uri) {
         setSelectedImage({ uri: result.assets[0].uri });
       }
     } catch (error) {
-      console.error('Gallery picker error:', error);
-      Alert.alert('Error', 'Could not open the photo gallery. Please try again.');
+      console.error("Gallery picker error:", error);
+      Alert.alert("Error", "Could not open the photo gallery. Please try again.");
     }
   };
 
   const openCamera = async () => {
     closeMenu();
-
-    if (Platform.OS === 'web') {
-      Alert.alert('Not Available', 'Camera capture is not supported in the web preview. Please choose from gallery instead.');
+    if (Platform.OS === "web") {
+      Alert.alert(
+        "Not Available",
+        "Camera capture is not supported in the web preview. Please choose from gallery instead."
+      );
       return;
     }
-
     try {
       const permission = await ImagePicker.requestCameraPermissionsAsync();
       if (!permission.granted) {
-        Alert.alert('Permission Needed', 'Camera access is required to take plant photos.');
+        Alert.alert("Permission Needed", "Camera access is required to take plant photos.");
         return;
       }
-
       const result = await ImagePicker.launchCameraAsync({ quality: 0.8 });
-
       if (!result.canceled && result.assets?.[0]?.uri) {
         setSelectedImage({ uri: result.assets[0].uri });
       }
     } catch (error) {
-      console.error('Camera error:', error);
-      Alert.alert('Error', 'Could not open the camera. Please try again.');
+      console.error("Camera error:", error);
+      Alert.alert("Error", "Could not open the camera. Please try again.");
     }
   };
 
-  const removeSelectedImage = () => setSelectedImage(null);
-
   return (
     <View style={styles.wrapper}>
-      {/* Image preview strip — Gemini/ChatGPT style, shows above input bar */}
-      {selectedImage && (
+      {selectedImage ? (
         <View style={styles.previewRow}>
-          <View style={styles.previewThumbWrap}>
+          <View>
             <Image source={{ uri: selectedImage.uri }} style={styles.previewThumb} />
-            <TouchableOpacity style={styles.removeBadge} onPress={removeSelectedImage}>
-              <Ionicons name="close" size={14} color={colors.white} />
-            </TouchableOpacity>
+            <Pressable style={styles.removeBadge} onPress={() => setSelectedImage(null)}>
+              <MaterialCommunityIcons name="close" size={14} color={palette.white} />
+            </Pressable>
           </View>
         </View>
-      )}
+      ) : null}
 
       <View style={styles.container}>
-        <TouchableOpacity style={styles.plusButton} onPress={handlePlusPress}>
-          <Ionicons name="add" size={24} color={colors.primaryGreen} />
-        </TouchableOpacity>
+        <Pressable style={styles.plusButton} onPress={() => setMenuVisible(true)}>
+          <MaterialCommunityIcons name="plus" size={24} color={palette.accent} />
+        </Pressable>
 
         <TextInput
           style={styles.input}
-          placeholder={selectedImage ? 'Add a caption (optional)...' : 'Ask anything...'}
-          placeholderTextColor={colors.textMuted}
+          placeholder={selectedImage ? "Add a caption (optional)..." : "Ask anything..."}
+          placeholderTextColor={palette.textMuted}
+          cursorColor={palette.accent}
           value={text}
           onChangeText={setText}
           onSubmitEditing={handleSend}
           returnKeyType="send"
         />
 
-        <TouchableOpacity
-          style={[
-            styles.sendButton,
-            !text.trim() && !selectedImage && styles.sendDisabled,
-          ]}
+        <Pressable
+          style={[styles.sendButton, !canSend && styles.sendDisabled]}
           onPress={handleSend}
-          disabled={!text.trim() && !selectedImage}
+          disabled={!canSend}
         >
-          <Ionicons name="send" size={16} color={colors.white} />
-        </TouchableOpacity>
+          <MaterialCommunityIcons name="send" size={18} color={palette.cream} />
+        </Pressable>
       </View>
 
-      {/* Action menu for + button */}
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={closeMenu}
-      >
+      <Modal visible={menuVisible} transparent animationType="fade" onRequestClose={closeMenu}>
         <Pressable style={styles.backdrop} onPress={closeMenu}>
           <Pressable style={styles.menuCard} onPress={(e) => e.stopPropagation?.()}>
-            <Text style={styles.menuTitle}>Upload Plant Photo</Text>
-            <Text style={styles.menuSubtitle}>
+            <View style={styles.handle} />
+            <Text style={inter(17, "700", palette.textDark)}>Upload Plant Photo</Text>
+            <Text style={[inter(13, "500", palette.textMuted), styles.menuSubtitle]}>
               Let PlantBot identify your plant or leaf problem
             </Text>
 
-            {Platform.OS !== 'web' && (
-              <TouchableOpacity style={styles.menuOption} onPress={openCamera}>
-                <Ionicons name="camera-outline" size={20} color={colors.primaryGreen} />
-                <Text style={styles.menuOptionText}>Take Photo</Text>
-              </TouchableOpacity>
-            )}
+            {Platform.OS !== "web" ? (
+              <Pressable style={styles.menuOption} onPress={openCamera}>
+                <MaterialCommunityIcons name="camera-outline" size={22} color={palette.accent} />
+                <Text style={[inter(15, "600", palette.textDark), styles.optionText]}>Take Photo</Text>
+              </Pressable>
+            ) : null}
 
-            <TouchableOpacity style={styles.menuOption} onPress={openGallery}>
-              <Ionicons name="images-outline" size={20} color={colors.primaryGreen} />
-              <Text style={styles.menuOptionText}>Choose from Gallery</Text>
-            </TouchableOpacity>
+            <Pressable style={styles.menuOption} onPress={openGallery}>
+              <MaterialCommunityIcons name="image-multiple-outline" size={22} color={palette.accent} />
+              <Text style={[inter(15, "600", palette.textDark), styles.optionText]}>
+                Choose from Gallery
+              </Text>
+            </Pressable>
 
-            <TouchableOpacity style={styles.menuCancel} onPress={closeMenu}>
-              <Text style={styles.menuCancelText}>Cancel</Text>
-            </TouchableOpacity>
+            <Pressable style={styles.menuCancel} onPress={closeMenu}>
+              <Text style={inter(15, "700", palette.danger)}>Cancel</Text>
+            </Pressable>
           </Pressable>
         </Pressable>
       </Modal>
@@ -164,118 +151,94 @@ export default function ChatInput({ onSendMessage }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = themed(() => ({
   wrapper: {
-    backgroundColor: colors.white,
+    backgroundColor: palette.surface,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    borderTopWidth: 1.5,
+    borderColor: palette.edge,
+    paddingBottom: 4,
   },
-  previewRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 12,
-    paddingTop: 10,
-  },
-  previewThumbWrap: {
-    position: 'relative',
-    marginRight: 8,
-  },
-  previewThumb: {
-    width: 64,
-    height: 64,
-    borderRadius: 10,
-    backgroundColor: '#EEE',
-  },
+  previewRow: { flexDirection: "row", paddingHorizontal: 14, paddingTop: 12 },
+  previewThumb: { width: 64, height: 64, borderRadius: 12, backgroundColor: tealA(0.08) },
   removeBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -6,
     right: -6,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#00000099',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
   },
   plusButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.bgLightGreen,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: tealA(0.1),
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 8,
   },
   input: {
     flex: 1,
-    height: 40,
-    backgroundColor: colors.white,
-    paddingHorizontal: 12,
-    fontSize: 15,
-    color: colors.textDark,
+    height: 44,
+    backgroundColor: palette.surfaceAlt,
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: palette.greenCardFill,
+    ...inter(15, "500", palette.textDark),
   },
   sendButton: {
     width: 44,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primaryGreen,
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: palette.teal,
+    alignItems: "center",
+    justifyContent: "center",
     marginLeft: 8,
   },
-  sendDisabled: {
-    backgroundColor: '#A0C4AB',
-  },
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    justifyContent: 'flex-end',
-  },
+  sendDisabled: { opacity: 0.45 },
+  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-end" },
   menuCard: {
-    backgroundColor: colors.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 20,
-    paddingTop: 18,
+    backgroundColor: palette.surface,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 22,
+    paddingTop: 10,
     paddingBottom: 30,
   },
-  menuTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textDark,
-    marginBottom: 4,
+  handle: {
+    alignSelf: "center",
+    width: 42,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: tealA(0.25),
+    marginBottom: 14,
   },
-  menuSubtitle: {
-    fontSize: 13,
-    color: colors.textMuted,
-    marginBottom: 16,
-  },
+  menuSubtitle: { marginTop: 4, marginBottom: 14 },
   menuOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 14,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: tealA(0.1),
   },
-  menuOptionText: {
-    fontSize: 15,
-    color: colors.textDark,
-    marginLeft: 12,
-    fontWeight: '500',
-  },
+  optionText: { marginLeft: 12 },
   menuCancel: {
-    marginTop: 8,
+    marginTop: 6,
     paddingVertical: 14,
-    alignItems: 'center',
+    alignItems: "center",
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: tealA(0.1),
   },
-  menuCancelText: {
-    fontSize: 15,
-    color: '#E53935',
-    fontWeight: '600',
-  },
-});
+}));

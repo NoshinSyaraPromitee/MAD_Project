@@ -1,25 +1,32 @@
 import React, { useContext, useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import AppScreen from "../components/AppScreen";
+import SearchBar from "../components/SearchBar";
+import EmptyView from "../components/EmptyView";
 import ProductCard from "../components/ProductCard";
-
 import products from "../data/products";
 import categories from "../data/categories";
-
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
+import { palette } from "../theme/colors";
+import { inter } from "../theme/typography";
+import { shadow } from "../theme/theme";
+import { themed } from "../theme/themed";
+
+function IconWithBadge({ icon, count, onPress }) {
+  return (
+    <Pressable onPress={onPress} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.8 }]}>
+      <MaterialCommunityIcons name={icon} size={22} color={palette.accent} />
+      {count > 0 ? (
+        <View style={styles.badge}>
+          <Text style={inter(10, "800", palette.white)}>{count}</Text>
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}
 
 export default function ShopScreen({ navigation }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -29,286 +36,109 @@ export default function ShopScreen({ navigation }) {
   const { wishlistItems } = useContext(WishlistContext);
 
   const filteredProducts = products.filter((item) => {
-    const categoryMatch =
-      selectedCategory === "All" ||
-      item.category === selectedCategory;
-
-    const searchMatch = item.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
+    const categoryMatch = selectedCategory === "All" || item.category === selectedCategory;
+    const searchMatch = item.name.toLowerCase().includes(search.toLowerCase());
     return categoryMatch && searchMatch;
   });
 
+  const chip = (name) => {
+    const selected = selectedCategory === name;
+    return (
+      <Pressable
+        key={name}
+        onPress={() => setSelectedCategory(name)}
+        style={[styles.category, selected && styles.categoryOn]}
+      >
+        <Text style={inter(13, "700", selected ? palette.cream : palette.textDark)}>{name}</Text>
+      </Pressable>
+    );
+  };
+
   return (
-    <LinearGradient
-      colors={["#FFF7E7", "#E8FFD8", "#FFF8EC"]}
-      style={styles.container}
+    <AppScreen
+      title="Shop"
+      edges={["top"]}
+      sideWidth={100}
+      trailing={
+        <View style={styles.headerIcons}>
+          <IconWithBadge
+            icon="heart-outline"
+            count={wishlistItems.length}
+            onPress={() => navigation.navigate("Wishlist")}
+          />
+          <IconWithBadge
+            icon="cart-outline"
+            count={cartItems.length}
+            onPress={() => navigation.navigate("Cart")}
+          />
+        </View>
+      }
     >
-      <SafeAreaView style={{ flex: 1 }}>
-        {/* Header */}
+  
 
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.backButton}
-            >
-              <MaterialCommunityIcons
-                name="arrow-left"
-                size={28}
-                color="#2E7D32"
-              />
-            </TouchableOpacity>
+      <SearchBar value={search} onChangeText={setSearch} placeholder="Search products..." />
 
-            <View>
-              <Text style={styles.smallText}>Store</Text>
-              <Text style={styles.title}>
-                Find Your necessary gardening equipment
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.headerIcons}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Wishlist")}
-              style={{ marginRight: 18 }}
-            >
-              <View>
-                <MaterialCommunityIcons
-                  name="heart-outline"
-                  size={30}
-                  color="#2E7D32"
-                />
-
-                {wishlistItems.length > 0 && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>
-                      {wishlistItems.length}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Cart")}
-            >
-              <View>
-                <MaterialCommunityIcons
-                  name="cart-outline"
-                  size={34}
-                  color="#2E7D32"
-                />
-
-                {cartItems.length > 0 && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>
-                      {cartItems.length}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Search */}
-
-        <View style={styles.searchContainer}>
-          <MaterialCommunityIcons
-            name="magnify"
-            size={24}
-            color="#777"
-          />
-
-          <TextInput
-            placeholder="Search plants..."
-            style={styles.searchInput}
-            value={search}
-            onChangeText={setSearch}
-          />
-        </View>
-
-        {/* Categories */}
-
+      <View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: 20,
-          }}
+          contentContainerStyle={styles.categories}
         >
-          <TouchableOpacity
-            onPress={() => setSelectedCategory("All")}
-            style={[
-              styles.category,
-              selectedCategory === "All" &&
-                styles.selectedCategory,
-            ]}
-          >
-            <Text
-              style={[
-                styles.categoryText,
-                selectedCategory === "All" &&
-                  styles.selectedText,
-              ]}
-            >
-              All
-            </Text>
-          </TouchableOpacity>
-
-          {categories.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              style={[
-                styles.category,
-                selectedCategory === item.name &&
-                  styles.selectedCategory,
-              ]}
-              onPress={() =>
-                setSelectedCategory(item.name)
-              }
-            >
-              <Text
-                style={[
-                  styles.categoryText,
-                  selectedCategory === item.name &&
-                    styles.selectedText,
-                ]}
-              >
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          {chip("All")}
+          {categories.map((item) => chip(item.name))}
         </ScrollView>
+      </View>
 
-        {/* Products */}
-
-        <FlatList
-          data={filteredProducts}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-          }}
-          renderItem={({ item }) => (
-            <ProductCard
-              product={item}
-              navigation={navigation}
-            />
-          )}
-        />
-      </SafeAreaView>
-    </LinearGradient>
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.list}
+        columnWrapperStyle={styles.column}
+        renderItem={({ item }) => <ProductCard product={item} navigation={navigation} />}
+        ListEmptyComponent={<EmptyView icon="storefront-outline" title="No products found" light />}
+      />
+    </AppScreen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+const styles = themed(() => ({
+  headerIcons: { flexDirection: "row", gap: 8 },
+  iconBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: palette.surface,
+    borderWidth: 2,
+    borderColor: palette.accent,
     alignItems: "center",
-    paddingHorizontal: 20,
-    marginTop: 15,
-    marginBottom: 20,
+    justifyContent: "center",
+    ...shadow(3),
   },
-
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-
-  backButton: {
-    marginRight: 12,
-    padding: 4,
-  },
-
-  headerIcons: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-
-  smallText: {
-    color: "#666",
-    fontSize: 16,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#2E7D32",
-    marginTop: 5,
-  },
-
-  searchContainer: {
-    marginHorizontal: 20,
-    backgroundColor: "#fff",
-    borderRadius: 18,
-    height: 55,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    elevation: 3,
-  },
-
-  searchInput: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 16,
-  },
-
-  category: {
-    backgroundColor: "#fff",
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 20,
-    marginRight: 10,
-    marginBottom: 15,
-    elevation: 2,
-  },
-
-  selectedCategory: {
-    backgroundColor: "#2E7D32",
-  },
-
-  categoryText: {
-    color: "#333",
-    fontWeight: "600",
-  },
-
-  selectedText: {
-    color: "#fff",
-  },
-
-  list: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-  },
-
   badge: {
     position: "absolute",
-    right: -6,
-    top: -6,
-    backgroundColor: "#FF9800",
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: "center",
+    top: -5,
+    right: -5,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 4,
+    backgroundColor: palette.danger,
     alignItems: "center",
+    justifyContent: "center",
   },
-
-  badgeText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 11,
+  subtitle: { textAlign: "center", marginBottom: 12 },
+  categories: { paddingBottom: 12, gap: 8 },
+  category: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: palette.surface,
+    borderWidth: 1.5,
+    borderColor: palette.edge,
   },
-});
+  categoryOn: { backgroundColor: palette.teal },
+  list: { paddingBottom: 24 },
+  column: { justifyContent: "space-between" },
+}));
