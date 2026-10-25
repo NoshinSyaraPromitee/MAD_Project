@@ -1,5 +1,16 @@
 const mongoose = require('mongoose');
 
+const careRoadmapSchema = new mongoose.Schema(
+  {
+    wateringTimes: { type: [String], default: [] }, 
+    waterAmountMl: { type: Number, default: 0 },
+    tips: { type: String, default: '' },
+    fertilizerRecommendation: { type: String, default: '' },
+    fertilizingIntervalDays: { type: Number, default: 0 }, 
+  },
+  { _id: false }
+);
+
 const plantSchema = new mongoose.Schema(
   {
     owner: {
@@ -14,6 +25,16 @@ const plantSchema = new mongoose.Schema(
     species: {
       type: String,
       required: true,
+    },
+    // "seed" | "seedling" | "young" | "mature" | "adult" - drives the roadmap.
+    ageStage: {
+      type: String,
+      default: '',
+    },
+    // Outdoor plants (garden, balcony) are the ones weather-aware tips apply to.
+    outdoor: {
+      type: Boolean,
+      default: false,
     },
     image: {
       type: String,
@@ -33,8 +54,9 @@ const plantSchema = new mongoose.Schema(
       default: '',
     },
 
+
     health: {
-      type: Number, 
+      type: Number,
       default: null,
     },
     status: {
@@ -58,14 +80,30 @@ const plantSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+
+    nextWateringAt: {
+      type: Date,
+      default: null,
+    },
+
+    careRoadmap: {
+      type: careRoadmapSchema,
+      default: undefined,
+    },
     fertilizerNote: {
       type: String,
       default: '',
     },
+    lastFertilized: {
+      type: Date,
+      default: null,
+    },
+    nextFertilizing: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
-
-
 
 module.exports = mongoose.model('Plant', plantSchema);
