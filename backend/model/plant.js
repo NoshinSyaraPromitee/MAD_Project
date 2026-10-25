@@ -33,12 +33,8 @@ const plantSchema = new mongoose.Schema(
       default: '',
     },
 
-    // --- The following are placeholders until a real scan feature exists.
-    // ScanPlantScreen.jsx currently has no logic behind it — ScanResult is
-    // an empty destination. Until that's built, these are either left blank
-    // at creation or entered manually; nothing computes them automatically yet.
     health: {
-      type: Number, // 0-100
+      type: Number, 
       default: null,
     },
     status: {
@@ -54,7 +50,6 @@ const plantSchema = new mongoose.Schema(
       default: null,
     },
 
-    // --- Watering, computable from real dates rather than free text
     wateringFrequencyDays: {
       type: Number,
       default: 7,
@@ -71,9 +66,6 @@ const plantSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// nextWatering and waterLevel ("Today" / "Tomorrow" / "2 Days") are derived
-// from lastWatered + wateringFrequencyDays rather than stored, so they can't
-// drift out of sync with the actual date. Computed in the route/serializer,
-// not stored as raw fields.
+
 
 module.exports = mongoose.model('Plant', plantSchema);
