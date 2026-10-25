@@ -8,8 +8,10 @@ const { resolveOffsetMinutes } = require('../utils/timezone');
 const { requireAuth } = require('../middleware/auth');
 const { imageUpload } = require('../utils/imageUpload');
 const { scanSource } = require('./diagnosisroutes');
+const { createGeminiProvider } = require('../services/aiProvider');
 
 const router = express.Router();
+const ai = createGeminiProvider();
 const plants = createPlantService({ Plant, PlantEvent, scanSource });
 
 router.use(requireAuth);
@@ -19,6 +21,15 @@ router.use(requireAuth);
 const tz = (req) => ({ offsetMinutes: resolveOffsetMinutes(req.headers) });
 
 // Route order matters: the fixed paths (/events, /due) must come before /:id.
+
+
+// POST /plants/identify  multipart: image (file)
+// Photo -> species, suggested nickname, location, sunlight, watering interval/amount,
+// health and care tips. Nothing is saved; the app previews it, then calls POST /plants.
+router.post('/identify', imageUpload('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image file provided (field name must be "image")' });
+  res.json(await ai.identify(req.file.buffer, req.file.detectedType));
+});
 
 // GET /plants
 router.get('/', async (req, res) => {
