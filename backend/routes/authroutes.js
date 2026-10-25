@@ -94,6 +94,33 @@ router.get('/google/session/:sessionId', (req, res) => {
   return res.json({ token: session.accessToken, accessToken: session.accessToken, refreshToken: session.refreshToken });
 });
 
+// POST /auth/google  { idToken }
+// Native Google Sign-In: the app gets an ID token from Google and sends it
+// here; same response shape as /auth/login. GOOGLE_CLIENT_ID may hold several
+// comma-separated client IDs (web / Android / iOS).
+const googleClientIds = () =>
+  String(process.env.GOOGLE_CLIENT_ID || '').split(',').map((s) => s.trim()).filter(Boolean);
+
+router.post('/google', async (req, res) => {
+  const audiences = googleClientIds();
+  if (!audiences.length) {
+    return res.status(503).json({ error: 'Google sign-in is not configured on this server' });
+  }
+  const idToken = String((req.body || {}).idToken || '').trim();
+  if (!idToken) return res.status(400).json({ error: 'idToken is required' });
+
+  let payload;
+  try {
+    const ticket = await oauthClient.verifyIdToken({ idToken, audience: audiences });
+    payload = ticket.getPayload();
+  } catch (err) {
+    return res.status(401).json({ error: 'invalid Google token' });
+  }
+
+  const { sub, email, name, picture, email_verified: emailVerified } = payload;
+  res.json(await auth.loginWithGoogle({ sub, email, name, picture, emailVerified }));
+});
+
 // ---- Email + password -------------------------------------------------------
 
 // POST /auth/register  { email, password, name }
