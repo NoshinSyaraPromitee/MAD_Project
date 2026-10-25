@@ -106,4 +106,8 @@ const plantSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Every plant query filters by owner (list/due/get) and the list sorts by
+// newest first, so this one compound index covers them all.
+plantSchema.index({ owner: 1, createdAt: -1 });
+
 module.exports = mongoose.model('Plant', plantSchema);
