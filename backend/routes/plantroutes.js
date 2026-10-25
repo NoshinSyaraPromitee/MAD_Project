@@ -3,97 +3,71 @@ const multer = require('multer');
 const streamifier = require('streamifier');
 const cloudinary = require('../config/cloudinary');
 const Plant = require('../model/plant');
+const PlantEvent = require('../model/plantEvent');
+const { createPlantService } = require('../services/plantService');
+const { resolveOffsetMinutes } = require('../utils/timezone');
 const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
+const plants = createPlantService({ Plant, PlantEvent });
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(requireAuth);
 
-// Adds the derived, UI-friendly fields the app expects (waterLevel, nextWatering)
-// without storing them, so they never go stale.
-function withDerivedFields(plantDoc) {
-  const plant = plantDoc.toObject();
+// Clients may send X-Timezone (e.g. Asia/Dhaka) or X-UTC-Offset-Minutes so that
+// "Today" / "Tomorrow" mean the user's day, not the server's.
+const tz = (req) => ({ offsetMinutes: resolveOffsetMinutes(req.headers) });
 
-  if (plant.lastWatered && plant.wateringFrequencyDays) {
-    const next = new Date(plant.lastWatered);
-    next.setDate(next.getDate() + plant.wateringFrequencyDays);
-    plant.nextWatering = next;
-
-    const daysUntil = Math.ceil((next - new Date()) / (1000 * 60 * 60 * 24));
-    if (daysUntil <= 0) plant.waterLevel = 'Today';
-    else if (daysUntil === 1) plant.waterLevel = 'Tomorrow';
-    else plant.waterLevel = `${daysUntil} Days`;
-  } else {
-    plant.nextWatering = null;
-    plant.waterLevel = 'Not set';
-  }
-
-  return plant;
-}
+// Route order matters: the fixed paths (/events, /due) must come before /:id.
 
 // GET /plants
 router.get('/', async (req, res) => {
-  const plants = await Plant.find({ owner: req.user.userId }).sort({ createdAt: -1 });
-  res.json(plants.map(withDerivedFields));
+  res.json(await plants.list(req.user.userId, tz(req)));
 });
 
 // POST /plants
+// { nickname, species, ageStage?, outdoor?, location?, sunlight?,
+//   wateringFrequencyDays?, lastWatered?, waterAmountMl?, careTips? }
 router.post('/', async (req, res) => {
-  const { nickname, species, location, sunlight, wateringFrequencyDays, lastWatered } = req.body;
+  res.status(201).json(await plants.create(req.user.userId, req.body || {}, tz(req)));
+});
 
-  if (!nickname || !species) {
-    return res.status(400).json({ error: 'nickname and species are required' });
+// GET /plants/events - the whole garden's timeline, newest first
+router.get('/events', async (req, res) => {
+  res.json(await plants.events(req.user.userId));
+});
+
+// GET /plants/due[?before=<ISO date>] - watering/fertilizing due now (or by `before`)
+router.get('/due', async (req, res) => {
+  let before = new Date();
+  if (req.query.before !== undefined) {
+    before = new Date(String(req.query.before));
+    if (Number.isNaN(before.getTime())) return res.status(400).json({ error: '?before must be a valid date' });
   }
+  res.json(await plants.due(req.user.userId, before, tz(req)));
+});
 
-  const plant = await Plant.create({
-    owner: req.user.userId,
-    nickname,
-    species,
-    location,
-    sunlight,
-    wateringFrequencyDays,
-    lastWatered,
-  });
+// GET /plants/:id
+router.get('/:id', async (req, res) => {
+  res.json(await plants.get(req.user.userId, req.params.id, tz(req)));
+});
 
-  res.status(201).json(withDerivedFields(plant));
+// GET /plants/:id/events
+router.get('/:id/events', async (req, res) => {
+  res.json(await plants.events(req.user.userId, req.params.id));
 });
 
 // PATCH /plants/:id
+// `health` is computed and cannot be set; the care roadmap is regenerated only
+// when species or ageStage actually change.
 router.patch('/:id', async (req, res) => {
-  const plant = await Plant.findOne({ _id: req.params.id, owner: req.user.userId });
-  if (!plant) {
-    return res.status(404).json({ error: 'Plant not found' });
-  }
-
-  const editable = [
-    'nickname',
-    'species',
-    'location',
-    'sunlight',
-    'wateringFrequencyDays',
-    'lastWatered',
-    'health',
-    'status',
-    'humidity',
-    'lastScan',
-    'fertilizerNote',
-  ];
-  editable.forEach((field) => {
-    if (req.body[field] !== undefined) plant[field] = req.body[field];
-  });
-
-  await plant.save();
-  res.json(withDerivedFields(plant));
+  res.json(await plants.update(req.user.userId, req.params.id, req.body || {}, tz(req)));
 });
 
 // DELETE /plants/:id
 router.delete('/:id', async (req, res) => {
-  const plant = await Plant.findOneAndDelete({ _id: req.params.id, owner: req.user.userId });
-  if (!plant) {
-    return res.status(404).json({ error: 'Plant not found' });
-  }
+  const plant = await plants.remove(req.user.userId, req.params.id);
 
   if (plant.imagePublicId) {
     await cloudinary.uploader.destroy(plant.imagePublicId).catch(() => {});
@@ -102,12 +76,30 @@ router.delete('/:id', async (req, res) => {
   res.json({ success: true });
 });
 
+// POST /plants/:id/water -> { plant, pointsEarned }
+router.post('/:id/water', async (req, res) => {
+  res.json(await plants.markWatered(req.user.userId, req.params.id, tz(req)));
+});
+
+// POST /plants/:id/fertilize -> { plant, pointsEarned }
+router.post('/:id/fertilize', async (req, res) => {
+  res.json(await plants.markFertilized(req.user.userId, req.params.id, tz(req)));
+});
+
+// POST /plants/:id/skip  { reason: soil_still_wet | rained | other, days?: 1-30 }
+router.post('/:id/skip', async (req, res) => {
+  res.json(await plants.skip(req.user.userId, req.params.id, req.body || {}, tz(req)));
+});
+
+// POST /plants/:id/notes  { note }
+router.post('/:id/notes', async (req, res) => {
+  const event = await plants.addNote(req.user.userId, req.params.id, (req.body || {}).note);
+  res.status(201).json({ status: 'recorded', event });
+});
+
 // POST /plants/:id/image — multipart/form-data, field name "image"
 router.post('/:id/image', upload.single('image'), async (req, res) => {
-  const plant = await Plant.findOne({ _id: req.params.id, owner: req.user.userId });
-  if (!plant) {
-    return res.status(404).json({ error: 'Plant not found' });
-  }
+  const plant = await plants.getOwned(req.user.userId, req.params.id);
   if (!req.file) {
     return res.status(400).json({ error: 'No image file provided (field name must be "image")' });
   }
@@ -129,7 +121,7 @@ router.post('/:id/image', upload.single('image'), async (req, res) => {
     plant.imagePublicId = uploadResult.public_id;
     await plant.save();
 
-    res.json(withDerivedFields(plant));
+    res.json(plants.present(plant, tz(req)));
   } catch (err) {
     console.error('Cloudinary upload error:', err);
     res.status(500).json({ error: 'Image upload failed' });
