@@ -2,8 +2,13 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../model/user');
+const RefreshToken = require('../model/refreshToken');
+const PasswordReset = require('../model/passwordReset');
+const { createAuthService } = require('../services/authService');
+const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
+const auth = createAuthService({ User, RefreshToken, PasswordReset });
 
 // Short-lived holding area: sessionId -> appToken. The final redirect back
 // into the app doesn't reliably carry query params through Expo Go's deep
@@ -46,39 +51,30 @@ router.get('/google/callback', async (req, res) => {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    const { sub, email, name, picture, email_verified: emailVerified } = payload;
 
-    // Find or create the user in Mongo
-    let user = await User.findOne({ googleId });
-    if (!user) {
-      user = await User.create({ googleId, email, name, avatarUrl: picture || '' });
-    }
-
-    // Issue our own session token — this is what the app uses from now on,
-    // not Google's tokens.
-    const appToken = jwt.sign(
-      { userId: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '30d' }
-    );
+    // Find by Google id, else link to an existing account with the same
+    // verified email, else create. Issues our own access + refresh tokens.
+    const session = await auth.loginWithGoogle({ sub, email, name, picture, emailVerified });
 
     // Stash the token under the sessionId the app sent as `state`, then
     // redirect the browser back with no sensitive data in the URL at all.
     if (!appRedirect) {
       // No state passed and no fallback set — show the token as JSON so you
       // can still test this route by hand.
-      return res.json({ warning: 'No redirect target (state or APP_REDIRECT_URI)', token: appToken, user });
+      return res.json({ warning: 'No redirect target (state or APP_REDIRECT_URI)', token: session.accessToken, ...session });
     }
 
     if (state) {
-      pendingSessions.set(state, appToken);
+      pendingSessions.set(state, session);
       setTimeout(() => pendingSessions.delete(state), SESSION_TTL_MS);
     }
 
     return res.redirect(appRedirect);
   } catch (err) {
     console.error('Google auth error:', err);
-    return res.status(500).send('Authentication failed');
+    // Surface deliberate auth errors (e.g. email linked to another Google account).
+    return res.status(err.status || 500).send(err.status ? err.message : 'Authentication failed');
   }
 });
 
@@ -87,14 +83,55 @@ router.get('/google/callback', async (req, res) => {
 // the token the callback above stashed. Single-use — deleted once read.
 router.get('/google/session/:sessionId', (req, res) => {
   const { sessionId } = req.params;
-  const token = pendingSessions.get(sessionId);
+  const session = pendingSessions.get(sessionId);
 
-  if (!token) {
+  if (!session) {
     return res.status(404).json({ error: 'Session not found or already used' });
   }
 
   pendingSessions.delete(sessionId);
-  return res.json({ token });
+  // `token` kept for the current app; accessToken/refreshToken are the new pair.
+  return res.json({ token: session.accessToken, accessToken: session.accessToken, refreshToken: session.refreshToken });
+});
+
+// ---- Email + password -------------------------------------------------------
+
+// POST /auth/register  { email, password, name }
+router.post('/register', async (req, res) => {
+  res.status(201).json(await auth.register(req.body || {}));
+});
+
+// POST /auth/login  { email, password }
+router.post('/login', async (req, res) => {
+  res.json(await auth.login(req.body || {}));
+});
+
+// POST /auth/refresh  { refreshToken }  -> new access + refresh (old one is revoked)
+router.post('/refresh', async (req, res) => {
+  res.json(await auth.refresh((req.body || {}).refreshToken));
+});
+
+// POST /auth/logout  { refreshToken }
+router.post('/logout', async (req, res) => {
+  await auth.logout((req.body || {}).refreshToken);
+  res.status(204).end();
+});
+
+// POST /auth/forgot-password  { email }
+router.post('/forgot-password', async (req, res) => {
+  await auth.forgotPassword((req.body || {}).email);
+  res.status(204).end();
+});
+
+// POST /auth/reset-password  { email, code, newPassword }
+router.post('/reset-password', async (req, res) => {
+  await auth.resetPassword(req.body || {});
+  res.status(204).end();
+});
+
+// GET /auth/me
+router.get('/me', requireAuth, async (req, res) => {
+  res.json(await auth.me(req.user.userId));
 });
 
 module.exports = router;
