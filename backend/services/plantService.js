@@ -30,10 +30,10 @@ function parseFrequency(value, { allowZero }) {
   return n;
 }
 
-function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
+function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => new Date() }) {
   // The response shape: stored fields plus everything derived on read, so
   // nothing derived can go stale. `offsetMinutes` is the caller's UTC offset.
-  function present(doc, { offsetMinutes = 0 } = {}) {
+  function present(doc, { offsetMinutes = 0, scan = null } = {}) {
     const at = now();
     const plant = typeof doc.toObject === 'function' ? doc.toObject() : { ...doc };
     const nextWatering = care.effectiveNextWatering(plant, at);
@@ -41,14 +41,34 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
     // Plants created before roadmaps existed get one computed on the fly.
     if (!care.hasRoadmap(plant.careRoadmap)) plant.careRoadmap = care.buildRoadmap(plant.species, plant.ageStage);
 
-    const health = care.computeHealth({ nextWateringAt: nextWatering, nextFertilizingAt: plant.nextFertilizing }, null, at);
+    const health = care.computeHealth({ nextWateringAt: nextWatering, nextFertilizingAt: plant.nextFertilizing }, scan, at);
     plant.nextWatering = nextWatering;
     plant.waterLevel = care.waterLevelFor(nextWatering, at, offsetMinutes);
     plant.health = health.score;
     plant.healthState = health.state;
     plant.healthReasons = health.reasons;
+    // Newest AI Doctor scan for this plant (null if never scanned).
+    plant.latestScan = scan ? { id: scan.id, issue: scan.issue, severity: scan.severity, at: scan.at, treated: scan.treated } : null;
     return plant;
   }
+
+
+  // Latest AI Doctor scan per plant, so health reflects it. Without a scan
+  // source (or if it fails) health falls back to care history only.
+  async function scansFor(userId, plants) {
+    if (!scanSource || !plants.length) return {};
+    try {
+      return await scanSource.latestScans(userId, plants.map((p) => p._id));
+    } catch (err) {
+      console.error('Loading latest scans failed:', err.message);
+      return {};
+    }
+  }
+  async function withScan(userId, plant, opts) {
+    const scans = await scansFor(userId, [plant]);
+    return { ...opts, scan: scans[String(plant._id)] || null };
+  }
+  const presentOne = async (userId, plant, opts) => present(plant, await withScan(userId, plant, opts));
 
   async function getOwned(userId, id) {
     const plant = await Plant.findOne({ _id: id, owner: userId });
@@ -70,11 +90,12 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
 
   async function list(userId, opts) {
     const plants = await Plant.find({ owner: userId }).sort({ createdAt: -1 });
-    return plants.map((p) => present(p, opts));
+    const scans = await scansFor(userId, plants);
+    return plants.map((p) => present(p, { ...opts, scan: scans[String(p._id)] || null }));
   }
 
   async function get(userId, id, opts) {
-    return present(await getOwned(userId, id), opts);
+    return presentOne(userId, await getOwned(userId, id), opts);
   }
 
   async function create(userId, body, opts) {
@@ -110,7 +131,7 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
       nextFertilizing: care.nextFertilizingFrom(roadmap, null, at),
     };
     plant.nextWateringAt = lastWatered ? care.scheduleNextWatering(plant, lastWatered, opts && opts.offsetMinutes) : at;
-    return present(await Plant.create(plant), opts);
+    return presentOne(userId, await Plant.create(plant), opts);
   }
 
   async function update(userId, id, body, opts) {
@@ -169,7 +190,7 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
     }
 
     await plant.save();
-    return present(plant, opts);
+    return presentOne(userId, plant, opts);
   }
 
   // Returns the removed document so the route can clean up its Cloudinary image.
@@ -191,7 +212,7 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
     plant.nextWateringAt = care.scheduleNextWatering(plant, at, opts && opts.offsetMinutes);
     await plant.save();
     await record(plant, userId, at, { eventType: 'water', points: pointsEarned });
-    return { plant: present(plant, opts), pointsEarned };
+    return { plant: await presentOne(userId, plant, opts), pointsEarned };
   }
 
   async function markFertilized(userId, id, opts) {
@@ -208,7 +229,7 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
     plant.nextFertilizing = care.nextFertilizingFrom(plant.careRoadmap, at, at);
     await plant.save();
     await record(plant, userId, at, { eventType: 'fertilize', points: pointsEarned });
-    return { plant: present(plant, opts), pointsEarned };
+    return { plant: await presentOne(userId, plant, opts), pointsEarned };
   }
 
   // "Not today": push the next watering back (soil still wet, it rained...).
@@ -225,7 +246,7 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
     plant.nextWateringAt = new Date(at.getTime() + snooze * care.DAY_MS);
     await plant.save();
     await record(plant, userId, at, { eventType: 'skip', reason, metadata: { snoozeDays: snooze } });
-    return present(plant, opts);
+    return presentOne(userId, plant, opts);
   }
 
   async function addNote(userId, id, note) {
@@ -248,13 +269,14 @@ function createPlantService({ Plant, PlantEvent, now = () => new Date() }) {
   async function due(userId, before, opts) {
     const plants = await Plant.find({ owner: userId });
     const dueAt = (p) => care.effectiveNextWatering(p, now());
+    const scans = await scansFor(userId, plants);
     return plants
       .filter((p) => dueAt(p) <= before || (p.nextFertilizing && new Date(p.nextFertilizing) <= before))
-      .map((p) => present(p, opts))
+      .map((p) => present(p, { ...opts, scan: scans[String(p._id)] || null }))
       .sort((a, b) => a.nextWatering - b.nextWatering);
   }
 
-  return { present, getOwned, list, get, create, update, remove, markWatered, markFertilized, skip, addNote, events, due };
+  return { present, presentOne, getOwned, list, get, create, update, remove, markWatered, markFertilized, skip, addNote, events, due };
 }
 
 module.exports = { createPlantService, PlantError };

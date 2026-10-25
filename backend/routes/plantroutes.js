@@ -7,9 +7,10 @@ const { createPlantService } = require('../services/plantService');
 const { resolveOffsetMinutes } = require('../utils/timezone');
 const { requireAuth } = require('../middleware/auth');
 const { imageUpload } = require('../utils/imageUpload');
+const { scanSource } = require('./diagnosisroutes');
 
 const router = express.Router();
-const plants = createPlantService({ Plant, PlantEvent });
+const plants = createPlantService({ Plant, PlantEvent, scanSource });
 
 router.use(requireAuth);
 
@@ -118,7 +119,7 @@ router.post('/:id/image', imageUpload('image'), async (req, res) => {
     plant.imagePublicId = uploadResult.public_id;
     await plant.save();
 
-    res.json(plants.present(plant, tz(req)));
+    res.json(await plants.presentOne(req.user.userId, plant, tz(req)));
   } catch (err) {
     console.error('Cloudinary upload error:', err);
     res.status(500).json({ error: 'Image upload failed' });
