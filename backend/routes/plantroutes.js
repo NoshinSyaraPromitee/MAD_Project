@@ -1,5 +1,4 @@
 const express = require('express');
-const multer = require('multer');
 const streamifier = require('streamifier');
 const cloudinary = require('../config/cloudinary');
 const Plant = require('../model/plant');
@@ -7,11 +6,10 @@ const PlantEvent = require('../model/plantEvent');
 const { createPlantService } = require('../services/plantService');
 const { resolveOffsetMinutes } = require('../utils/timezone');
 const { requireAuth } = require('../middleware/auth');
+const { imageUpload } = require('../utils/imageUpload');
 
 const router = express.Router();
 const plants = createPlantService({ Plant, PlantEvent });
-
-const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(requireAuth);
 
@@ -97,8 +95,7 @@ router.post('/:id/notes', async (req, res) => {
   res.status(201).json({ status: 'recorded', event });
 });
 
-// POST /plants/:id/image — multipart/form-data, field name "image"
-router.post('/:id/image', upload.single('image'), async (req, res) => {
+router.post('/:id/image', imageUpload('image'), async (req, res) => {
   const plant = await plants.getOwned(req.user.userId, req.params.id);
   if (!req.file) {
     return res.status(400).json({ error: 'No image file provided (field name must be "image")' });
