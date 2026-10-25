@@ -5,6 +5,9 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/authroutes');
 const plantRoutes = require('./routes/plantroutes');
+const fertilizerRoutes = require('./routes/fertilizerroutes');
+const Fertilizer = require('./model/fertilizer');
+const fertilizerSeed = require('./data/fertilizers.json');
 
 const app = express();
 app.use(cors());
@@ -14,6 +17,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/auth', authRoutes);
 app.use('/plants', plantRoutes);
+app.use('/fertilizers', fertilizerRoutes);
 
 // 404 for unknown routes, then one JSON error handler for everything above.
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
@@ -35,6 +39,10 @@ mongoose
     // partial-unique googleId index (the old one was a plain unique index).
     await Promise.all(
       [require('./model/user'), require('./model/refreshToken'), require('./model/passwordReset')].map((m) => m.syncIndexes())
+    );
+    // Insert the built-in recipes once; $setOnInsert never overwrites edits.
+    await Fertilizer.bulkWrite(
+      fertilizerSeed.map((f) => ({ updateOne: { filter: { _id: f._id }, update: { $setOnInsert: f }, upsert: true } }))
     );
   })
   .catch((err) => console.error('MongoDB connection error:', err));
