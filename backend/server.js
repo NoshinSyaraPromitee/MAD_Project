@@ -12,7 +12,7 @@ const { requestLogger } = require('./middleware/requestLogger');
 const fertilizerRoutes = require('./routes/fertilizerroutes');
 const Fertilizer = require('./model/fertilizer');
 const fertilizerSeed = require('./data/fertilizers.json');
-
+const orderRoutes = require('./routes/orderroutes'); 
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -26,7 +26,7 @@ app.use('/plants', plantRoutes);
 app.use('/diagnoses', diagnosisRoutes);
 app.use('/products', productRoutes);
 app.use('/fertilizers', fertilizerRoutes);
-
+app.use('/orders', orderRoutes); 
 // 404 for unknown routes, then one JSON error handler for everything above.
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 app.use((err, req, res, next) => {
