@@ -23,6 +23,7 @@ userSchema.index(
 
 userSchema.set('toJSON', {
   transform: (_doc, ret) => {
+    ret.id = String(ret._id); // Go-style alias; _id stays for existing clients
     delete ret.passwordHash;
     delete ret.googleId;
     delete ret.__v;

@@ -36,6 +36,7 @@ function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => 
   function present(doc, { offsetMinutes = 0, scan = null, lang = 'en' } = {}) {
     const at = now();
     const plant = typeof doc.toObject === 'function' ? doc.toObject() : { ...doc };
+    plant.id = String(plant._id); // Go-style alias; _id stays for existing clients
     const nextWatering = care.effectiveNextWatering(plant, at);
 
     // Plants created before roadmaps existed get one computed on the fly.
@@ -260,7 +261,8 @@ function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => 
   async function events(userId, id) {
     const filter = { owner: userId };
     if (id) filter.plant = (await getOwned(userId, id))._id;
-    return PlantEvent.find(filter).sort({ createdAt: -1 }).limit(EVENT_LIST_LIMIT).lean();
+    const rows = await PlantEvent.find(filter).sort({ createdAt: -1 }).limit(EVENT_LIST_LIMIT).lean();
+    return rows.map((r) => ({ ...r, id: String(r._id) }));
   }
 
   // Plants with a watering or fertilizing reminder due at or before `before`,

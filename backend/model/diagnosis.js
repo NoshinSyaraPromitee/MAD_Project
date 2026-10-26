@@ -35,6 +35,7 @@ diagnosisSchema.methods.present = function (lang) {
   const bn = lang === 'bn' && d.issueBn;
   return {
     _id: d._id,
+    id: String(d._id),
     plantId: d.plant ? String(d.plant) : null,
     issue: bn ? d.issueBn : d.issue,
     cure: bn ? d.cureBn || d.cure : d.cure,

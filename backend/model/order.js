@@ -42,9 +42,8 @@ orderSchema.index({ userId: 1, createdAt: -1 });
 
 orderSchema.set('toJSON', {
   transform: (_doc, ret) => {
-    ret.id = ret._id;
+    ret.id = ret._id; // _id is kept too, like plants/diagnoses/users
     ret.userId = String(ret.userId);
-    delete ret._id;
     delete ret.__v;
     return ret;
   },
