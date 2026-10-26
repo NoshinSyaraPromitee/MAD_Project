@@ -1,56 +1,303 @@
-# Welcome to your Expo app 👋
+# 🌿 MyPlantPal
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+MyPlantPal is a React Native mobile application built with **Expo** that helps users identify plants, learn about plant care, and manage their gardening journey through an easy-to-use interface.
 
-## Get started
+---
 
-1. Install dependencies
+## 📱 Features
 
-   ```bash
-   npm install
-   ```
+- 🌱 Plant Identification
+- 📷 Scan plants using the camera
+- 🖼️ Select images from the gallery
+- 💡 AI-powered plant information
+- 📖 Plant care guide
+- ❤️ Save favorite plants
+- 👤 User profile
+- 🛍️ Plant shop section
+- 🔐 Authentication (Login & Register)
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+# 🛠️ Technologies Used
 
-In the output, you'll find options to open the app in a
+- React Native
+- Expo SDK 57
+- React Navigation
+- Expo Camera
+- Expo Image Picker
+- Expo Font
+- Axios
+- JavaScript
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+# 📋 Prerequisites
 
-## Get a fresh project
+Before running the project, install the following:
 
-When you're ready, run:
+## 1. Node.js
+
+Download and install:
+
+https://nodejs.org/
+
+Verify installation:
 
 ```bash
-npm run reset-project
+node -v
+npm -v
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-### Other setup steps
+## 2. Git (Optional)
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Download:
 
-## Learn more
+https://git-scm.com/
 
-To learn more about developing your project with Expo, look at the following resources:
+Verify:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+git --version
+```
 
-## Join the community
+---
 
-Join our community of developers creating universal apps.
+## 3. Visual Studio Code
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Download:
+
+https://code.visualstudio.com/
+
+Recommended Extensions:
+
+- ESLint
+- Prettier
+- React Native Tools
+
+---
+
+## 4. Expo Go (Android/iOS)
+
+Install the Expo Go application on your phone.
+
+Android:
+https://play.google.com/store/apps/details?id=host.exp.exponent
+
+iOS:
+https://apps.apple.com/app/expo-go/id982107779
+
+---
+
+# 📦 Installation
+
+Clone the repository
+
+```bash
+git clone <repository-url>
+```
+
+or download the ZIP and extract it.
+
+Move into the project folder
+
+```bash
+cd MyPlantPal
+```
+
+Install all dependencies
+
+```bash
+npm install
+```
+
+or
+
+```bash
+npm install --legacy-peer-deps
+```
+
+if dependency conflicts occur.
+
+---
+
+# ▶️ Running the Project
+
+Start the Expo development server.
+
+```bash
+npx expo start
+```
+
+or
+
+```bash
+npm start
+```
+
+You will see a QR Code.
+
+Open **Expo Go** on your mobile device and scan the QR code.
+
+The application will launch automatically.
+
+---
+
+# 📂 Project Structure
+
+```
+MyPlantPal/
+│
+├── assets/
+├── components/
+├── screens/
+├── navigation/
+├── services/
+├── utils/
+├── App.js
+├── package.json
+└── README.md
+```
+
+---
+
+# 📷 How to Use
+
+## Plant Scan
+
+1. Open the app.
+2. Navigate to the Scan page.
+3. Allow camera permission.
+4. Capture a plant image or select one from the gallery.
+5. Wait for the analysis.
+6. View the plant information and care guide.
+
+---
+
+## Plant Care Guide
+
+- Browse plant information.
+- Read watering schedules.
+- Learn sunlight requirements.
+- View maintenance tips.
+
+---
+
+## Favorites
+
+- Tap the ❤️ icon to save a plant.
+- Access saved plants from your profile.
+
+---
+
+## User Account
+
+- Register a new account.
+- Log in using your credentials.
+- View your saved plants.
+
+---
+
+# 📦 Installing New Packages
+
+If additional packages are needed, install them using:
+
+```bash
+npx expo install package-name
+```
+
+or
+
+```bash
+npm install package-name
+```
+
+Example:
+
+```bash
+npx expo install expo-camera
+```
+
+---
+
+# 🔧 Common Commands
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Start development server
+
+```bash
+npx expo start
+```
+
+Run on Android
+
+```bash
+npx expo run:android
+```
+
+Run on iOS
+
+```bash
+npx expo run:ios
+```
+
+Clear Expo cache
+
+```bash
+npx expo start --clear
+```
+
+---
+
+# ⚠️ Troubleshooting
+
+### Module not found
+
+Run
+
+```bash
+npm install
+```
+
+---
+
+### Expo cache issue
+
+```bash
+npx expo start --clear
+```
+
+---
+
+### Camera permission denied
+
+Grant Camera permission from your phone settings.
+
+---
+
+### Metro Bundler errors
+
+Delete `node_modules` and reinstall.
+
+```bash
+rm -rf node_modules
+npm install
+```
+
+---
+
+# 👩‍💻 Developer
+
+Developed using React Native and Expo.
+
+---
+
+# 📄 License
+
+This project is for educational purposes.
