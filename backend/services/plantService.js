@@ -1,3 +1,4 @@
+const mongoose = require('mongoose'); // NEW
 const care = require('./plantCare');
 
 class PlantError extends Error {
@@ -265,6 +266,15 @@ function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => 
     return rows.map((r) => ({ ...r, id: String(r._id) }));
   }
 
+  // NEW: sum of the points on this user's events (water = 10, fertilize = 20 when due).
+  async function totalPoints(userId) {
+    const [row] = await PlantEvent.aggregate([
+      { $match: { owner: new mongoose.Types.ObjectId(String(userId)) } },
+      { $group: { _id: null, total: { $sum: '$points' } } },
+    ]);
+    return row ? row.total : 0;
+  }
+
   // Plants with a watering or fertilizing reminder due at or before `before`,
   // soonest first. Filtered here (not in the query) so plants created before
   // nextWateringAt existed are included.
@@ -278,7 +288,7 @@ function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => 
       .sort((a, b) => a.nextWatering - b.nextWatering);
   }
 
-  return { present, presentOne, getOwned, list, get, create, update, remove, markWatered, markFertilized, skip, addNote, events, due };
+  return { present, presentOne, getOwned, list, get, create, update, remove, markWatered, markFertilized, skip, addNote, events, totalPoints, due }; // NEW: totalPoints added
 }
 
 module.exports = { createPlantService, PlantError };

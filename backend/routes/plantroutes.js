@@ -22,7 +22,7 @@ const tz = (req) => ({
   offsetMinutes: resolveOffsetMinutes(req.headers),
   lang: String(req.headers['accept-language'] || '').toLowerCase().startsWith('bn') ? 'bn' : 'en',
 });
-// Route order matters: the fixed paths (/events, /due) must come before /:id.
+// Route order matters: the fixed paths (/events, /points, /due) must come before /:id. // NEW: added /points
 
 
 // POST /plants/identify  multipart: image (file)
@@ -48,6 +48,12 @@ router.post('/', async (req, res) => {
 // GET /plants/events - the whole garden's timeline, newest first
 router.get('/events', async (req, res) => {
   res.json(await plants.events(req.user.userId));
+});
+
+// NEW: GET /plants/points -> { totalPoints }
+// Sum of the points earned from watering/fertilizing when due.
+router.get('/points', async (req, res) => {
+  res.json({ totalPoints: await plants.totalPoints(req.user.userId) });
 });
 
 // GET /plants/due[?before=<ISO date>] - watering/fertilizing due now (or by `before`)
