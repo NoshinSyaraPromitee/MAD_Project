@@ -33,13 +33,13 @@ function parseFrequency(value, { allowZero }) {
 function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => new Date() }) {
   // The response shape: stored fields plus everything derived on read, so
   // nothing derived can go stale. `offsetMinutes` is the caller's UTC offset.
-  function present(doc, { offsetMinutes = 0, scan = null } = {}) {
+  function present(doc, { offsetMinutes = 0, scan = null, lang = 'en' } = {}) {
     const at = now();
     const plant = typeof doc.toObject === 'function' ? doc.toObject() : { ...doc };
     const nextWatering = care.effectiveNextWatering(plant, at);
 
     // Plants created before roadmaps existed get one computed on the fly.
-    if (!care.hasRoadmap(plant.careRoadmap)) plant.careRoadmap = care.buildRoadmap(plant.species, plant.ageStage);
+    if (!care.hasRoadmap(plant.careRoadmap)) plant.careRoadmap = care.buildRoadmap(plant.species, plant.ageStage, lang);
 
     const health = care.computeHealth({ nextWateringAt: nextWatering, nextFertilizingAt: plant.nextFertilizing }, scan, at);
     plant.nextWatering = nextWatering;
@@ -108,7 +108,7 @@ function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => 
     let lastWatered = parseDate(body.lastWatered, 'lastWatered');
     if (lastWatered && lastWatered > at) lastWatered = at; // a watering can't be in the future
 
-    const roadmap = care.buildRoadmap(species, body.ageStage);
+    const roadmap = care.buildRoadmap(species, body.ageStage, opts && opts.lang);
     // Values the AI-identify step previewed replace the rule-based ones, so the
     // saved plan matches what the user saw.
     const amount = Number(body.waterAmountMl);
@@ -184,7 +184,7 @@ function createPlantService({ Plant, PlantEvent, scanSource = null, now = () => 
 
     // The roadmap is regenerated only when species/age stage really changed.
     if (regenerate) {
-      plant.careRoadmap = care.buildRoadmap(plant.species, plant.ageStage);
+      plant.careRoadmap = care.buildRoadmap(plant.species, plant.ageStage, opts && opts.lang);
       if (body.fertilizerNote === undefined) plant.fertilizerNote = plant.careRoadmap.fertilizerRecommendation;
       plant.nextFertilizing = care.nextFertilizingFrom(plant.careRoadmap, plant.lastFertilized, at);
     }

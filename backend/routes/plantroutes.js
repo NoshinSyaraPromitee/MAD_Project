@@ -18,8 +18,10 @@ router.use(requireAuth);
 
 // Clients may send X-Timezone (e.g. Asia/Dhaka) or X-UTC-Offset-Minutes so that
 // "Today" / "Tomorrow" mean the user's day, not the server's.
-const tz = (req) => ({ offsetMinutes: resolveOffsetMinutes(req.headers) });
-
+const tz = (req) => ({
+  offsetMinutes: resolveOffsetMinutes(req.headers),
+  lang: String(req.headers['accept-language'] || '').toLowerCase().startsWith('bn') ? 'bn' : 'en',
+});
 // Route order matters: the fixed paths (/events, /due) must come before /:id.
 
 

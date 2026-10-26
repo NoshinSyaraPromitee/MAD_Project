@@ -23,12 +23,16 @@ const HEALTH = Object.freeze({
 
 
 // Rule-based care plan derived from the plant's age stage and species.
-function buildRoadmap(species, ageStage) {
+function buildRoadmap(species, ageStage, lang = 'en') {
+  const bn = lang === 'bn';
   let waterAmountMl = 200;
   let wateringTimes = ['08:00', '18:00'];
   let fertilizingIntervalDays = 14;
   let fertilizerRecommendation = 'Use a balanced NPK fertilizer every 2 weeks.';
-  const tips = "Don't expose to excess sun; find a cool, dry place with plenty of indirect sunlight.";
+  const tips = bn
+    ? 'অতিরিক্ত রোদ এড়িয়ে চলুন; পর্যাপ্ত পরোক্ষ আলোযুক্ত একটি ঠান্ডা, শুকনো জায়গা বেছে নিন।'
+    : "Don't expose to excess sun; find a cool, dry place with plenty of indirect sunlight.";
+  if (bn) fertilizerRecommendation = 'প্রতি ২ সপ্তাহে একটি সুষম NPK সার ব্যবহার করুন।';
 
   switch (String(ageStage || '').trim().toLowerCase()) {
     case 'seed':
@@ -36,14 +40,18 @@ function buildRoadmap(species, ageStage) {
       waterAmountMl = 100;
       wateringTimes = ['08:00'];
       fertilizingIntervalDays = 0;
-      fertilizerRecommendation = 'Avoid fertilizer until the first true leaves appear.';
+      fertilizerRecommendation = bn
+        ? 'প্রথম প্রকৃত পাতা না গজানো পর্যন্ত সার ব্যবহার এড়িয়ে চলুন।'
+        : 'Avoid fertilizer until the first true leaves appear.';
       break;
     case 'mature':
     case 'adult':
       waterAmountMl = 300;
       wateringTimes = ['08:00', '12:00', '18:00'];
       fertilizingIntervalDays = 7;
-      fertilizerRecommendation = 'Use Potassium (K) based fertilizer to support blooming.';
+      fertilizerRecommendation = bn
+        ? 'ফুল ফোটাতে সাহায্য করতে পটাশিয়াম (K) ভিত্তিক সার ব্যবহার করুন।'
+        : 'Use Potassium (K) based fertilizer to support blooming.';
       break;
     default:
   }
