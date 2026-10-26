@@ -24,13 +24,12 @@ MyPlantPal is a React Native mobile app built with **Expo** that helps you ident
 
 # 🛠️ Technologies Used
 
-- React Native 0.88 (New Architecture)
-- Expo SDK 58
-- React 19
-- React Navigation 7 (Native Stack + Bottom Tabs)
+- React Native (New Architecture)
+- Expo
+- React Navigation (Native Stack + Bottom Tabs)
 - Context API (Auth, Plants, Cart, Wishlist, Theme)
 - Google Gemini API (AI Doctor)
-- Rive (`rive-react-native`, `@rive-app/canvas`, `react-native-webview`)
+- Rive (`rive-react-native`)
 - Expo Image Picker, Expo File System, Expo Secure Store, Expo Linear Gradient
 - Google Fonts: Fredoka + Inter (`@expo-google-fonts`)
 - JavaScript
@@ -52,38 +51,59 @@ npm -v
 
 https://git-scm.com/
 
+## 3. Java JDK 17
+
+https://adoptium.net/
+
 ```bash
-git --version
+java -version
 ```
 
-## 3. Visual Studio Code
+## 4. Android SDK
+
+Install the Android SDK (with **Platform-Tools**), then set the environment variables.
+
+Windows (PowerShell). Replace the path with your SDK location:
+
+```powershell
+setx ANDROID_HOME "C:\Users\<you>\AppData\Local\Android\Sdk"
+setx PATH "$env:PATH;C:\Users\<you>\AppData\Local\Android\Sdk\platform-tools"
+```
+
+Close and reopen the terminal, then check:
+
+```bash
+adb version
+```
+
+## 5. Android phone with USB debugging
+
+1. **Settings → About phone** → tap **Build number** 7 times to enable Developer options.
+2. **Settings → Developer options** → turn on **USB debugging**.
+3. Connect the phone with a USB cable and accept the **Allow USB debugging?** prompt.
+
+Check that the phone is detected:
+
+```bash
+adb devices
+```
+
+It should show your device as `device` (not `unauthorized`).
+
+## 6. Visual Studio Code
 
 https://code.visualstudio.com/
 
 Recommended extensions: ESLint, Prettier, React Native Tools.
 
-## 4. Expo Go (SDK 58) on your phone
-
-- Android: https://play.google.com/store/apps/details?id=host.exp.exponent
-- iOS: https://apps.apple.com/app/expo-go/id982107779
-
-> Expo Go must support **SDK 58**. If it says the project is incompatible, update Expo Go from the store.
-
 ---
 
 # 📦 Installation
-
-Clone the repository
 
 ```bash
 git clone https://github.com/NoshinSyaraPromitee/MAD_Project.git
 cd MAD_Project
 git checkout till-progress-presentations
-```
-
-Install dependencies
-
-```bash
 npm install
 ```
 
@@ -109,47 +129,37 @@ Get a key from https://aistudio.google.com/app/apikey
 
 ---
 
-# ▶️ Running the Project
+# ▶️ Running on Your Phone (USB)
+
+With the phone connected and `adb devices` showing it:
 
 ```bash
-npx expo start -c
+npx expo run:android
 ```
 
-- **Phone:** open **Expo Go** and scan the QR code
-- **Browser:** press `w`
-- **Android emulator:** press `a`
+The first build takes a few minutes. It installs **MyPlantPal** on your phone and opens it.
+
+After that, you only need to start the dev server:
+
+```bash
+npx expo start --dev-client -c
+```
+
+Then open the MyPlantPal app on your phone. Rebuild with `npx expo run:android` only after adding a package that has native code.
+
+If you have more than one device connected:
+
+```bash
+npx expo run:android --device
+```
 
 ---
 
 # 🐾 About the Rive Mascot
 
-The mascot (`assets/animations/totoro.riv`) plays everywhere, using a different player depending on where the app runs:
+The mascot (`assets/animations/totoro.riv`) runs on the native Rive runtime.
 
-| Where you run it | Player used |
-|---|---|
-| Browser (`w`) | `@rive-app/canvas` |
-| Expo Go | Rive web player inside a WebView |
-| Development build | Native `rive-react-native` |
-
-Tapping the mascot toggles `mouthOpen`, steps `numState` (0 → 1 → 2) and fires `trigState`.
-
-> In Expo Go and the browser, the Rive player loads from a CDN, so the device needs **internet**. Without it, a GIF is shown instead.
-
-### Optional: build your own development app (native Rive, no Android Studio)
-
-```bash
-npm install -g eas-cli
-eas login
-npx expo install expo-dev-client
-eas build:configure
-eas build -p android --profile development
-```
-
-Install the APK from the link EAS gives you, then run:
-
-```bash
-npx expo start --dev-client -c
-```
+Tapping it toggles `mouthOpen`, steps `numState` (0 → 1 → 2) and fires `trigState`.
 
 ---
 
@@ -213,10 +223,14 @@ Profile → ⚙️ Settings → Appearance → **Dark Mode**. Your choice is rem
 
 # 📦 Installing New Packages
 
-Use `expo install` so the versions match SDK 58:
-
 ```bash
 npx expo install package-name
+```
+
+If the package has native code, rebuild afterwards:
+
+```bash
+npx expo run:android
 ```
 
 ---
@@ -226,41 +240,76 @@ npx expo install package-name
 | Task | Command |
 |---|---|
 | Install dependencies | `npm install` |
-| Start dev server | `npx expo start` |
-| Start with cache cleared | `npx expo start -c` |
-| Run in browser | `npx expo start --web` |
-| Start for a development build | `npx expo start --dev-client` |
+| Build and install on phone (USB) | `npx expo run:android` |
+| Start dev server | `npx expo start --dev-client` |
+| Start with cache cleared | `npx expo start --dev-client -c` |
+| List connected devices | `adb devices` |
 | Check package versions | `npx expo install --check` |
 
 ---
 
 # ⚠️ Troubleshooting
 
-### "Project is incompatible with this version of Expo Go"
+### `adb devices` shows nothing or `unauthorized`
 
-Update Expo Go from the Play Store or App Store so it supports SDK 58.
-
-### `View config not found for component RiveReactNativeView`
-
-Native Rive isn't available in Expo Go. Make sure `react-native-webview` and `expo-asset` are installed:
+Use a data cable (not charge-only), turn USB debugging on, and accept the prompt on the phone. Then:
 
 ```bash
-npx expo install react-native-webview expo-asset @rive-app/canvas
+adb kill-server
+adb devices
+```
+
+### `ANDROID_HOME` / SDK not found
+
+Check that `ANDROID_HOME` points to your Android SDK folder and that `platform-tools` is in `PATH`. Reopen the terminal after changing them.
+
+### App can't connect to the dev server
+
+Forward the Metro port over USB:
+
+```bash
+adb reverse tcp:8081 tcp:8081
 ```
 
 ### Mascot shows a GIF instead of the animation
 
-The device has no internet (the Rive player loads from a CDN).
+Rebuild the app so the native Rive module is included:
+
+```bash
+npx expo run:android
+```
 
 ### AI Doctor says the key is missing / requests fail
 
-Check `.env` exists with `EXPO_PUBLIC_GEMINI_API_KEY`, then restart with `npx expo start -c`.
+Check `.env` exists with `EXPO_PUBLIC_GEMINI_API_KEY`, then restart with `npx expo start --dev-client -c`.
 
 ### `stream-buffers` / `streambuffer.js` missing during install
 
 `package.json` already pins it through `overrides`. Delete `node_modules` and `package-lock.json`, then run `npm install`.
 
----
+### Build fails after changing packages
+
+Windows (PowerShell):
+
+```powershell
+Remove-Item -Recurse -Force node_modules, android
+npm install
+npx expo run:android
+```
+
+macOS / Linux:
+
+```bash
+rm -rf node_modules android
+npm install
+npx expo run:android
+```
+
+### Camera permission denied
+
+Allow camera access for MyPlantPal in your phone's settings.
+
+
 
 # 📄 License
 
