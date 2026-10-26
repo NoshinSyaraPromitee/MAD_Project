@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('node:dns/promises').setServers(['1.1.1.1', '8.8.8.8']);
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -6,6 +7,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authroutes');
 const plantRoutes = require('./routes/plantroutes');
 const diagnosisRoutes = require('./routes/diagnosisroutes');
+const productRoutes = require('./routes/productroutes');
 const { requestLogger } = require('./middleware/requestLogger');
 const fertilizerRoutes = require('./routes/fertilizerroutes');
 const Fertilizer = require('./model/fertilizer');
@@ -22,6 +24,7 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/auth', authRoutes);
 app.use('/plants', plantRoutes);
 app.use('/diagnoses', diagnosisRoutes);
+app.use('/products', productRoutes);
 app.use('/fertilizers', fertilizerRoutes);
 
 // 404 for unknown routes, then one JSON error handler for everything above.
