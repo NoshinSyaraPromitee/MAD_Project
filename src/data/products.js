@@ -113,6 +113,115 @@ const products = [
       "Strong steel trowel for digging, transplanting, and gardening tasks.",
     image: "https://tse3.mm.bing.net/th/id/OIP.aJ5M5laNeU4wfYrk-mVYtQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
   },
+    {
+    id: "11",
+    name: "Lemon Tree Sapling",
+    category: "Plants",
+    price: 220,
+    rating: 4.8,
+    stock: 30,
+    description: "Grafted lemon sapling that fruits early and thrives in home gardens.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTgPqpgD3h1mBDHdLMSeJwZU7Okdx8gUIFg1rFjM1B_Jg&s=10",
+  },
+
+  {
+    id: "12",
+    name: "Papaya Plant",
+    category: "Plants",
+    price: 150,
+    rating: 4.7,
+    stock: 35,
+    description: "Fast-growing papaya plant that fruits within a year in warm weather.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR97Y3kQ_f3L6zI7ttGJY2Nbu1prHc5sauFEqhVcTQtDw&s=10",
+  },
+
+  {
+    id: "13",
+    name: "Hibiscus (Joba) Plant",
+    category: "Plants",
+    price: 200,
+    rating: 4.8,
+    stock: 28,
+    description: "Flowering hibiscus plant with bright blooms, great for front yards.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE_-EdsHvF-xcisB_cHPaqKLbG2YRgHVtiEC_5aXR79w&s=10",
+  },
+
+  {
+    id: "14",
+    name: "Plastic Grow Bag (Set of 5)",
+    category: "Pots",
+    price: 250,
+    rating: 4.6,
+    stock: 80,
+    description: "Durable UV-resistant grow bags ideal for rooftop and balcony gardening.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8K5qnvByLA25O65XxSmF-XmsN9zy_FPzfLmXmGC9gfA&s=10",
+  },
+
+  {
+    id: "15",
+    name: "Hanging Planter Pot",
+    category: "Pots",
+    price: 180,
+    rating: 4.5,
+    stock: 45,
+    description: "Lightweight hanging pot with drainage holes for balconies and windows.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5pHJTVWjE-Xzxx0-FS24-QlwXi3_ftZ45hHl4GOS9Mw&s=10",
+  },
+
+  {
+    id: "16",
+    name: "Neem Cake Fertilizer (1 kg)",
+    category: "Fertilizers",
+    price: 120,
+    rating: 4.7,
+    stock: 70,
+    description: "Natural neem cake that enriches soil and helps reduce root pests.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-AdaZwP8ajQtDCZbQmTPabuc-vrTq7eCbAZ0gXjs7cw&s=10",
+  },
+
+  {
+    id: "17",
+    name: "Cow Dung Compost (5 kg)",
+    category: "Fertilizers",
+    price: 150,
+    rating: 4.8,
+    stock: 90,
+    description: "Well-decomposed cow dung compost for vegetables, fruits and flowers.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6f-dCuSRJGsm4u0jPM29PmxjIjR6JfsMzN61yEXaf4g&s",
+  },
+
+  {
+    id: "18",
+    name: "Garden Pruning Shears",
+    category: "Tools",
+    price: 350,
+    rating: 4.7,
+    stock: 22,
+    description: "Sharp stainless-steel shears for trimming branches and shaping plants.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7rTM0tY5u0NRX38oouWehCnCCStuEEQRUsfQEb3b8DA&s=10",
+  },
+
+  {
+    id: "19",
+    name: "Chili (Morich) Seeds",
+    category: "Seeds",
+    price: 50,
+    rating: 4.8,
+    stock: 130,
+    description: "High-yield chili seeds suited to Bangladesh's climate and pot growing.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSoMwCOFwkwfQcKQi8eJzfVqK2YHgBqZcwQ08aeieLtHQ&s=10",
+  },
+
+  {
+    id: "20",
+    name: "Red Spinach (Lal Shak) Seeds",
+    category: "Seeds",
+    price: 40,
+    rating: 4.9,
+    stock: 160,
+    description: "Fast-growing red spinach seeds that can be harvested in about 30 days.",
+    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5ofbFJkdeDQWsBSIJn3DEc2_fhzWX5MRF3HEInDKhwg&s=10",
+  },
 ];
 
 export default products;
