@@ -1,0 +1,15 @@
+[
+  { "id": "plants", "name": "Houseplants", "nameBn": "ইনডোর গাছ" },
+  { "id": "outdoor-plants", "name": "Outdoor Plants", "nameBn": "আউটডোর গাছ" },
+  { "id": "flowering-plants", "name": "Flowering Plants", "nameBn": "ফুল গাছ" },
+  { "id": "succulents-cacti", "name": "Succulents and Cacti", "nameBn": "সাকুলেন্ট ও ক্যাকটাস" },
+  { "id": "herbs-vegetables", "name": "Herbs and Vegetables", "nameBn": "ভেষজ ও শাকসবজি" },
+  { "id": "seeds", "name": "Seeds", "nameBn": "বীজ" },
+  { "id": "pots-planters", "name": "Pots and Planters", "nameBn": "টব ও প্লান্টার" },
+  { "id": "soil-potting-mix", "name": "Soil and Potting Mix", "nameBn": "মাটি ও পটিং মিক্স" },
+  { "id": "fertilizer", "name": "Fertilizers", "nameBn": "সার" },
+  { "id": "care", "name": "Plant Care and Pest Control", "nameBn": "গাছের যত্ন ও সুরক্ষা" },
+  { "id": "gardening-tools", "name": "Gardening Tools", "nameBn": "বাগানের যন্ত্রপাতি" },
+  { "id": "watering-equipment", "name": "Watering Equipment", "nameBn": "পানি দেওয়ার সরঞ্জাম" },
+  { "id": "grow-lights", "name": "Grow Lights and Accessories", "nameBn": "গ্রো লাইট ও সরঞ্জাম" }
+]
